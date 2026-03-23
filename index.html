@@ -1,1 +1,1935 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Musk Foundation | Grants for Science, Engineering & Civilization</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+<!-- ============================================================
+     STYLES
+     ============================================================ -->
+<style>
+
+/* ── ROOT VARIABLES ── */
+:root{
+  --navy:#080d1a;--navy2:#0d1628;--navy3:#111e35;
+  --gold:#c9a84c;--gold2:#e8c97a;--gold-dim:rgba(201,168,76,0.15);
+  --cream:#f0ead8;--text:rgba(240,234,216,0.9);--text-muted:rgba(240,234,216,0.45);
+  --border:rgba(201,168,76,0.18);--border-light:rgba(240,234,216,0.07);
+  --card-bg:rgba(13,22,40,0.9);
+}
+
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden;cursor:none}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--navy)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+
+/* ── CURSOR ── */
+.cur,.cur-ring{position:fixed;pointer-events:none;z-index:9999;border-radius:50%;transform:translate(-50%,-50%)}
+.cur{width:8px;height:8px;background:var(--gold);transition:width .15s,height .15s}
+.cur-ring{width:36px;height:36px;border:1px solid var(--gold);opacity:.5;transition:width .25s,height .25s}
+.cur.grow{width:16px;height:16px}.cur-ring.grow{width:56px;height:56px;opacity:.2}
+
+/* ── CANVAS ── */
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── PAGE SYSTEM ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── NAV ── */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:74px;transition:background .4s,border-bottom .4s}
+#navbar.scrolled{background:rgba(8,13,26,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;letter-spacing:2px;color:var(--cream);text-decoration:none;display:flex;align-items:center;gap:12px;cursor:none}
+.nav-mark{width:34px;height:34px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;letter-spacing:1px;color:var(--gold);font-family:'Syne',sans-serif}
+.nav-links{display:flex;gap:32px;list-style:none;align-items:center}
+.nav-links a{font-size:.68rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color .2s;font-family:'JetBrains Mono',monospace;cursor:none}
+.nav-links a:hover{color:var(--gold2)}
+.nav-links a.active{color:var(--gold)}
+.nav-cta{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;padding:10px 26px;background:transparent;border:1px solid var(--gold);color:var(--gold);cursor:none;transition:all .25s;text-decoration:none;flex-shrink:0}
+.nav-cta:hover{background:var(--gold);color:var(--navy)}
+.mob-btn{display:none;background:none;border:none;cursor:none;color:var(--gold);font-size:1.4rem}
+#mob-menu{display:none;position:fixed;inset:0;z-index:490;background:rgba(8,13,26,0.98);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:28px}
+#mob-menu.open{display:flex}
+#mob-menu a{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--cream);text-decoration:none;letter-spacing:3px;transition:color .2s;cursor:none}
+#mob-menu a:hover{color:var(--gold)}
+.mob-close{position:absolute;top:28px;right:28px;background:none;border:none;color:var(--gold);font-size:1.8rem;cursor:none}
+
+/* ── SHARED SECTIONS ── */
+.sec{position:relative;z-index:10;padding:110px 60px}
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:.63rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.sec-label::before{content:'';width:26px;height:1px;background:var(--gold)}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4.4rem);font-weight:300;line-height:1.05;color:var(--cream)}
+.sec-title em{font-style:italic;color:var(--gold)}
+.divider{width:56px;height:1px;background:var(--gold);margin:28px 0;opacity:.5}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* ── SHARED BUTTONS ── */
+.btn-gold{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;padding:15px 42px;background:var(--gold);color:var(--navy);border:none;cursor:none;transition:all .25s;text-decoration:none;display:inline-block}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-outline{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;padding:15px 42px;background:transparent;color:var(--cream);border:1px solid rgba(240,234,216,0.22);cursor:none;transition:all .25s;text-decoration:none;display:inline-block}
+.btn-outline:hover{border-color:var(--cream);transform:translateY(-2px)}
+
+
+/* ── FOOTER MESSAGE FORM ── */
+.fmsg{background:var(--navy2);border-top:1px solid var(--border);padding:60px 60px 50px;position:relative;z-index:10}
+.fmsg h3{font-size:1.1rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:400;margin-bottom:8px}
+.fmsg p.fmsg-sub{font-size:.88rem;color:var(--text-muted);margin-bottom:32px}
+.fmsg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fmsg-field{display:flex;flex-direction:column;gap:7px}
+.fmsg-field.full{grid-column:1/-1}
+.fmsg-field label{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+.fmsg-field input,.fmsg-field textarea{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);padding:11px 14px;color:var(--cream);font-family:'Syne',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;width:100%;resize:vertical}
+.fmsg-field input:focus,.fmsg-field textarea:focus{border-color:var(--gold)}
+.fmsg-field input::placeholder,.fmsg-field textarea::placeholder{color:rgba(240,234,216,0.3)}
+.fmsg-actions{display:flex;align-items:center;justify-content:space-between;margin-top:20px;flex-wrap:wrap;gap:14px}
+.fmsg-btn{padding:13px 36px;background:var(--gold);color:var(--navy);border:none;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;cursor:none;transition:background .2s,transform .2s}
+.fmsg-btn:hover{background:var(--gold2);transform:translateY(-2px)}
+.fmsg-note{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:1px;color:var(--text-muted)}
+.fmsg-ok{display:none;margin-top:24px;padding:16px 22px;border:1px solid rgba(201,168,76,0.3);background:rgba(201,168,76,0.06);color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:1.5px}
+.fmsg-ok.show{display:block}
+@media(max-width:768px){.fmsg{padding:44px 22px}.fmsg-grid{grid-template-columns:1fr}}
+
+/* ── SHARED FOOTER ── */
+footer{background:var(--navy);border-top:1px solid var(--border);padding:76px 60px 38px;position:relative;z-index:10}
+.foot-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:72px;margin-bottom:60px}
+.foot-brand-em{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-style:italic;color:var(--gold);display:block;margin-bottom:6px}
+.foot-brand-cap{font-family:'Syne',sans-serif;font-size:.72rem;letter-spacing:4px;text-transform:uppercase;color:var(--cream);margin-bottom:18px;display:block}
+.foot-about{font-size:.85rem;line-height:1.7;color:var(--text-muted);max-width:270px;margin-bottom:26px}
+.foot-social{display:flex;gap:10px}
+.soc{width:36px;height:36px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.82rem;transition:all .2s;text-decoration:none;cursor:none}
+.soc:hover{border-color:var(--gold);color:var(--gold)}
+.foot-col h4{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+.foot-col ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.foot-col a{font-size:.85rem;color:var(--text-muted);text-decoration:none;transition:color .2s;cursor:none}
+.foot-col a:hover{color:var(--cream)}
+.foot-bottom{border-top:1px solid var(--border-light);padding-top:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.foot-copy{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;color:var(--text-muted)}
+.foot-legal{display:flex;gap:26px}
+.foot-legal a{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;color:var(--text-muted);text-decoration:none;transition:color .2s;cursor:none}
+.foot-legal a:hover{color:var(--gold)}
+
+/* ── BTT ── */
+#btt{position:fixed;bottom:34px;right:34px;z-index:200;width:44px;height:44px;background:var(--gold-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--gold);cursor:none;transition:all .25s;opacity:0;pointer-events:none;transform:translateY(8px);font-size:1rem}
+#btt.show{opacity:1;pointer-events:all;transform:translateY(0)}
+#btt:hover{background:var(--gold);color:var(--navy)}
+
+/* ── PAGE HERO (about & contact) ── */
+.page-hero{position:relative;z-index:10;min-height:50vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 40px 80px;border-bottom:1px solid var(--border)}
+.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(201,168,76,0.07),transparent);pointer-events:none}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;display:flex;align-items:center;gap:16px;opacity:0;animation:rise .9s .3s ease forwards}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';flex:1;max-width:60px;height:1px;background:var(--gold)}
+.hero-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,7vw,6.5rem);font-weight:300;line-height:.95;letter-spacing:-1px;color:var(--cream);margin-bottom:20px;opacity:0;animation:rise .9s .5s ease forwards}
+.hero-h1 em{font-style:italic;color:var(--gold)}
+.hero-sub{max-width:560px;font-family:'Cormorant Garamond',serif;font-size:clamp(1rem,2vw,1.4rem);font-weight:300;font-style:italic;color:var(--text-muted);opacity:0;animation:rise .9s .7s ease forwards}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ================================================================
+   HOME PAGE STYLES
+   ================================================================ */
+
+/* HERO */
+#hero{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 40px 80px}
+.hero-h1-lg{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,9vw,8.5rem);font-weight:300;line-height:.95;letter-spacing:-1px;color:var(--cream);margin-bottom:16px;opacity:0;animation:rise .9s .5s ease forwards}
+.hero-h1-lg em{font-style:italic;color:var(--gold)}
+.hero-sub-sm{font-family:'Cormorant Garamond',serif;font-size:clamp(1.1rem,2.5vw,1.8rem);font-weight:300;font-style:italic;color:var(--text-muted);margin-bottom:44px;opacity:0;animation:rise .9s .7s ease forwards}
+.hero-desc{max-width:580px;font-size:.97rem;line-height:1.85;color:var(--text-muted);margin-bottom:52px;opacity:0;animation:rise .9s .9s ease forwards}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:rise .9s 1.1s ease forwards}
+.scroll-hint{position:absolute;bottom:38px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);opacity:0;animation:rise 1s 1.5s ease forwards}
+.scroll-line{width:1px;height:56px;background:linear-gradient(to bottom,var(--gold),transparent);animation:pulse 2s ease-in-out infinite}
+
+/* TICKER */
+#ticker{position:relative;z-index:10;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:16px 0;background:rgba(13,22,40,0.6);backdrop-filter:blur(10px)}
+.ticker-inner{display:flex;animation:tick 40s linear infinite;white-space:nowrap}
+.t-item{padding:0 56px;font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:14px}
+.t-dot{width:5px;height:5px;background:var(--gold);border-radius:50%;flex-shrink:0}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* STATS */
+#stats{background:var(--navy2);padding-top:70px;padding-bottom:70px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+.s-box{background:var(--navy2);padding:52px 44px;position:relative;overflow:hidden;transition:background .3s}
+.s-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .5s;transform-origin:left}
+.s-box:hover{background:var(--navy3)}.s-box:hover::before{transform:scaleX(1)}
+.s-num{font-family:'Cormorant Garamond',serif;font-size:4.2rem;font-weight:300;color:var(--gold);line-height:1;margin-bottom:10px}
+.s-lbl{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted)}
+.s-sub{font-size:.82rem;color:var(--text-muted);margin-top:7px;line-height:1.5}
+
+/* CRISIS NOTICE BANNER */
+#crisis-notice{position:relative;z-index:10;background:linear-gradient(135deg,rgba(13,22,40,0.98),rgba(17,30,53,0.98));border-top:1px solid rgba(201,168,76,0.35);border-bottom:1px solid rgba(201,168,76,0.35);padding:64px 60px;overflow:hidden}
+#crisis-notice::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 20% 50%,rgba(201,168,76,0.07),transparent);pointer-events:none}
+#crisis-notice::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.cn-inner{max-width:900px;position:relative}
+.cn-badge{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,0.4);padding:7px 18px;margin-bottom:28px;background:rgba(201,168,76,0.06)}
+.cn-badge-dot{width:7px;height:7px;background:var(--gold);border-radius:50%;animation:pulse 1.8s ease-in-out infinite}
+.cn-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3.5vw,2.9rem);font-weight:300;color:var(--cream);line-height:1.15;margin-bottom:20px}
+.cn-title em{font-style:italic;color:var(--gold)}
+.cn-divider{width:48px;height:1px;background:var(--gold);opacity:.5;margin-bottom:22px}
+.cn-body{font-size:.97rem;line-height:1.85;color:var(--text-muted);max-width:760px;margin-bottom:32px}
+.cn-body strong{color:var(--cream);font-weight:600}
+.cn-cta{display:inline-flex;align-items:center;gap:14px}
+.cn-btn{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:2.5px;text-transform:uppercase;padding:14px 38px;background:var(--gold);color:var(--navy);border:none;cursor:none;transition:all .25s;text-decoration:none;display:inline-block}
+.cn-btn:hover{background:var(--gold2);transform:translateY(-2px)}
+.cn-link{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color .2s;cursor:none}
+.cn-link:hover{color:var(--gold)}
+.cn-deco{position:absolute;right:60px;top:50%;transform:translateY(-50%);font-family:'Cormorant Garamond',serif;font-size:9rem;font-weight:300;color:rgba(201,168,76,0.05);line-height:1;pointer-events:none;user-select:none}
+@media(max-width:768px){#crisis-notice{padding:44px 22px}.cn-deco{display:none}}
+
+/* ABOUT SECTION (home) */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:90px;align-items:center}
+.about-visual{position:relative;height:540px}
+.ab-frame{position:absolute;border:1px solid var(--border)}
+.ab-frame-1{inset:0;background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)}
+.ab-frame-2{top:22px;left:22px;right:-22px;bottom:-22px;border-color:rgba(201,168,76,0.08);z-index:-1}
+.ab-inner{position:absolute;inset:0;padding:48px;display:flex;flex-direction:column;justify-content:space-between}
+.ab-quote{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-style:italic;font-weight:300;line-height:1.55;color:var(--cream);border-left:2px solid var(--gold);padding-left:22px}
+.ab-quote cite{display:block;margin-top:14px;font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:2px;color:var(--gold)}
+.pillars{display:flex;flex-direction:column;gap:22px}
+.pill{display:flex;gap:18px;align-items:flex-start}
+.pill-n{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--gold);letter-spacing:2px;min-width:26px;margin-top:3px}
+.pill-t{font-size:.92rem;font-weight:600;margin-bottom:5px;color:var(--cream)}
+.pill-d{font-size:.83rem;line-height:1.6;color:var(--text-muted)}
+.about-text p{font-size:1rem;line-height:1.85;color:var(--text-muted);margin-bottom:22px}
+.founder-box{display:flex;align-items:center;gap:18px;margin-top:36px;padding:26px;border:1px solid var(--border);background:var(--gold-dim)}
+.f-avatar{width:56px;height:56px;border:1px solid var(--gold);background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:var(--gold);flex-shrink:0}
+.f-info h4{font-size:.95rem;color:var(--cream);font-weight:600;margin-bottom:3px}
+.f-info p{font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+
+/* FOCUS AREAS */
+.area-tabs{display:flex;border-bottom:1px solid var(--border);flex-wrap:wrap;margin-bottom:0}
+.a-tab{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:2.5px;text-transform:uppercase;padding:15px 26px;background:transparent;border:none;color:var(--text-muted);cursor:none;border-bottom:2px solid transparent;transition:all .25s;margin-bottom:-1px}
+.a-tab:hover{color:var(--gold2)}.a-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.area-pane{display:none;grid-template-columns:1fr 1.5fr;gap:70px;align-items:start;padding-top:56px}
+.area-pane.active{display:grid}
+.area-meta{position:sticky;top:96px}
+.area-icon{font-size:3.2rem;margin-bottom:24px;display:block;filter:drop-shadow(0 0 18px rgba(201,168,76,0.3))}
+.area-name{font-family:'Cormorant Garamond',serif;font-size:2.7rem;font-weight:300;color:var(--cream);margin-bottom:14px;line-height:1.1}
+.area-badge{display:inline-block;padding:7px 18px;background:var(--gold-dim);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:2px;color:var(--gold);margin-bottom:26px}
+.area-body{font-size:.97rem;line-height:1.85;color:var(--text-muted);margin-bottom:28px}
+.exa-list{display:flex;flex-direction:column;gap:14px}
+.exa{display:flex;gap:14px;padding:15px;border:1px solid var(--border-light);transition:all .2s}
+.exa:hover{border-color:var(--border);background:rgba(201,168,76,0.03)}
+.exa-arrow{color:var(--gold);font-size:.85rem;margin-top:2px;flex-shrink:0}
+.exa-t{font-size:.85rem;line-height:1.6;color:var(--text-muted)}
+.exa-t strong{color:var(--cream);font-weight:600;display:block;margin-bottom:3px}
+
+/* APPLY */
+.apply-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:90px;align-items:start}
+.steps{display:flex;flex-direction:column;position:relative}
+.steps::before{content:'';position:absolute;left:21px;top:44px;bottom:44px;width:1px;background:linear-gradient(to bottom,var(--gold),rgba(201,168,76,0.08))}
+.step{display:flex;gap:26px;padding-bottom:44px;position:relative}
+.step:last-child{padding-bottom:0}
+.step-n-wrap{width:44px;height:44px;border:1px solid var(--gold);background:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1}
+.step-n{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--gold)}
+.step-body{padding-top:8px}
+.step-body h3{font-size:1.02rem;font-weight:700;color:var(--cream);margin-bottom:7px;letter-spacing:.5px}
+.step-body p{font-size:.87rem;line-height:1.75;color:var(--text-muted)}
+.step-tag{display:inline-block;margin-top:9px;padding:3px 13px;background:var(--gold-dim);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+.apply-sidebar{position:sticky;top:96px}
+.elig-card{border:1px solid var(--border);background:var(--card-bg);padding:40px}
+.elig-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--cream);margin-bottom:24px}
+.elig-item{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid var(--border-light);font-size:.84rem;line-height:1.6;color:var(--text-muted)}
+.elig-item:last-child{border-bottom:none}
+.elig-icon{color:var(--gold);flex-shrink:0;margin-top:1px}
+.dl-card{margin-top:18px;padding:26px;background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));border:1px solid var(--border)}
+.dl-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.dl-val{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--cream)}
+.dl-note{font-size:.78rem;color:var(--text-muted);margin-top:7px;line-height:1.5}
+
+/* GRANTEES */
+.filter-row{display:flex;gap:0;border:1px solid var(--border);width:fit-content;flex-wrap:wrap}
+.f-btn{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;padding:11px 22px;background:transparent;border:none;color:var(--text-muted);cursor:none;transition:all .2s;border-right:1px solid var(--border)}
+.f-btn:last-child{border-right:none}.f-btn:hover{color:var(--gold2)}.f-btn.active{background:var(--gold-dim);color:var(--gold)}
+.grantees-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:40px}
+.gc{background:var(--navy2);padding:40px;transition:background .25s;position:relative;overflow:hidden}
+.gc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,0.05),transparent);opacity:0;transition:opacity .3s}
+.gc:hover{background:var(--navy3)}.gc:hover::after{opacity:1}
+.gc-year{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:3px;color:var(--text-muted);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.gc-status{padding:3px 10px;font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:2px;text-transform:uppercase}
+.gc-status.active{background:rgba(61,127,255,0.12);color:#5b9bff;border:1px solid rgba(61,127,255,0.25)}
+.gc-status.done{background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid var(--border)}
+.gc-org{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--cream);margin-bottom:9px}
+.gc-proj{font-size:.84rem;line-height:1.7;color:var(--text-muted);margin-bottom:18px}
+.gc-amt{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--gold);margin-bottom:10px}
+.gc-tag{display:inline-block;padding:3px 10px;background:rgba(201,168,76,0.06);border:1px solid var(--border-light);font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+
+/* NEWS */
+.news-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:22px}
+.n-card{border:1px solid var(--border-light);padding:32px;transition:border-color .25s,background .25s;cursor:none}
+.n-card:hover{border-color:var(--border);background:rgba(201,168,76,0.02)}
+.n-card.feat{background:linear-gradient(160deg,rgba(201,168,76,0.06),transparent)}
+.n-cat{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.n-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--cream);margin-bottom:12px;line-height:1.3}
+.n-card.feat .n-title{font-size:1.9rem}
+.n-excerpt{font-size:.84rem;line-height:1.75;color:var(--text-muted);margin-bottom:22px}
+.n-meta{display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:2px;color:var(--text-muted)}
+.n-read{color:var(--gold);text-decoration:none;transition:letter-spacing .2s;cursor:none}
+.n-read:hover{letter-spacing:3px}
+
+/* TESTIMONIALS */
+.t-slider{position:relative;overflow:hidden}
+.t-track{display:flex;transition:transform .6s cubic-bezier(.25,.46,.45,.94)}
+.t-slide{min-width:100%;padding:0 100px;text-align:center}
+.t-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(1.3rem,2.8vw,1.95rem);font-weight:300;font-style:italic;line-height:1.55;color:var(--cream);margin-bottom:40px;position:relative}
+.t-quote::before{content:'\201C';font-size:7rem;color:var(--gold);opacity:.12;position:absolute;top:-36px;left:50%;transform:translateX(-50%);font-family:'Cormorant Garamond',serif;line-height:1;pointer-events:none}
+.t-author{display:flex;flex-direction:column;align-items:center;gap:6px}
+.t-name{font-size:.92rem;font-weight:700;color:var(--cream)}
+.t-role{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold)}
+.t-org{font-size:.8rem;color:var(--text-muted)}
+.t-dots{display:flex;justify-content:center;gap:10px;margin-top:44px}
+.t-dot-btn{width:8px;height:8px;border-radius:50%;background:var(--text-muted);border:none;cursor:none;transition:all .25s}
+.t-dot-btn.active{background:var(--gold);width:26px;border-radius:4px}
+.t-arrows{display:flex;justify-content:space-between;position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);pointer-events:none}
+.t-arrow{background:none;border:1px solid var(--border);width:44px;height:44px;cursor:none;pointer-events:all;display:flex;align-items:center;justify-content:center;color:var(--gold);transition:all .2s}
+.t-arrow:hover{background:var(--gold-dim);border-color:var(--gold)}
+
+/* FAQ */
+.faq-grid{display:grid;grid-template-columns:1fr 2fr;gap:76px;align-items:start}
+.faq-left{position:sticky;top:96px}
+.faq-left p{font-size:.93rem;line-height:1.75;color:var(--text-muted);margin-top:14px}
+.faq-contact{margin-top:32px;padding:26px;border:1px solid var(--border)}
+.faq-contact p{font-size:.83rem;color:var(--text-muted);margin-bottom:14px}
+.faq-list{display:flex;flex-direction:column}
+.faq-item{border-bottom:1px solid var(--border-light)}
+.faq-q{width:100%;background:none;border:none;padding:26px 0;display:flex;justify-content:space-between;align-items:center;cursor:none;text-align:left;gap:18px}
+.faq-q span:first-child{font-size:.97rem;font-weight:600;color:var(--cream);line-height:1.4;transition:color .2s}
+.faq-q:hover span:first-child{color:var(--gold2)}
+.faq-tog{width:26px;height:26px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.95rem;flex-shrink:0;transition:all .25s}
+.faq-item.open .faq-tog{background:var(--gold-dim);transform:rotate(45deg)}
+.faq-ans{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;font-size:.88rem;line-height:1.8;color:var(--text-muted)}
+.faq-item.open .faq-ans{max-height:300px;padding-bottom:26px}
+
+/* NEWSLETTER */
+.nl-inner{max-width:680px;margin:0 auto;text-align:center}
+.nl-inner p{font-size:.97rem;line-height:1.7;color:var(--text-muted);margin-bottom:36px}
+.nl-form{display:flex;gap:0;max-width:500px;margin:0 auto 14px}
+.nl-input{flex:1;background:rgba(240,234,216,0.05);border:1px solid var(--border);border-right:none;padding:15px 22px;color:var(--cream);font-family:'Syne',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s}
+.nl-input::placeholder{color:var(--text-muted)}.nl-input:focus{border-color:var(--gold)}
+.nl-btn{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:2px;text-transform:uppercase;padding:15px 26px;background:var(--gold);color:var(--navy);border:none;cursor:none;transition:background .2s;flex-shrink:0}
+.nl-btn:hover{background:var(--gold2)}
+.nl-note{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:1px;color:var(--text-muted)}
+
+/* PARTNERS */
+.partners-row{display:flex;flex-wrap:wrap;justify-content:center;border:1px solid var(--border);margin-top:40px}
+.p-item{padding:28px 44px;border-right:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;color:var(--text-muted);letter-spacing:2px;transition:color .2s;display:flex;align-items:center}
+.p-item:last-child{border-right:none}.p-item:hover{color:var(--cream)}
+
+/* APPLY MODAL */
+#app-modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+#app-modal.open{display:flex}
+.app-overlay{position:absolute;inset:0;background:rgba(8,13,26,0.96);backdrop-filter:blur(16px)}
+.app-box{position:relative;z-index:1;background:var(--navy2);border:1px solid var(--border);max-width:740px;width:100%;max-height:90vh;overflow-y:auto}
+.app-head{padding:36px 48px 28px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--navy2);z-index:2}
+.app-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--cream)}
+.app-title span{font-style:italic;color:var(--gold)}
+.app-close{background:none;border:1px solid var(--border);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:none;color:var(--text-muted);font-size:1.1rem;transition:all .2s;flex-shrink:0}
+.app-close:hover{border-color:var(--gold);color:var(--gold)}
+.app-body{padding:40px 48px}
+.app-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:36px}
+.app-tab{flex:1;padding:11px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;cursor:default}
+.app-tab.done{color:var(--gold)}.app-tab.active{color:var(--gold2);border-bottom-color:var(--gold2)}
+.f-sec{display:none}.f-sec.active{display:block}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.f-grp{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.f-grp label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.f-grp input,.f-grp select,.f-grp textarea{background:rgba(240,234,216,0.04);border:1px solid var(--border-light);padding:13px 16px;color:var(--cream);font-family:'Syne',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;resize:vertical}
+.f-grp input:focus,.f-grp select:focus,.f-grp textarea:focus{border-color:var(--gold)}
+.f-grp select option{background:var(--navy2);color:var(--cream)}
+.f-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:24px;border-top:1px solid var(--border-light)}
+.b-sm{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;padding:11px 28px;cursor:none;transition:all .2s;border:1px solid}
+.b-sm-g{background:var(--gold);color:var(--navy);border-color:var(--gold)}.b-sm-g:hover{background:var(--gold2);border-color:var(--gold2)}
+.b-sm-o{background:transparent;color:var(--cream);border-color:var(--border)}.b-sm-o:hover{border-color:var(--cream)}
+.f-prog{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;color:var(--text-muted)}
+.success-sc{text-align:center;padding:36px 0;display:none}.success-sc.show{display:block}
+.success-sc h3{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);margin-bottom:12px}
+.success-sc p{font-size:.92rem;color:var(--text-muted);line-height:1.7;margin-bottom:28px}
+
+/* ================================================================
+   ABOUT PAGE STYLES
+   ================================================================ */
+
+/* MISSION */
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:90px;align-items:center}
+.mission-text p{font-size:1rem;line-height:1.9;color:var(--text-muted);margin-bottom:22px}
+.mission-text p:first-child{font-size:1.12rem;color:var(--text);line-height:1.8}
+.mission-quote{position:relative;padding:48px;border:1px solid var(--border);background:linear-gradient(135deg,rgba(201,168,76,0.06),transparent)}
+.mission-quote::before{content:'\201C';font-family:'Cormorant Garamond',serif;font-size:8rem;color:var(--gold);opacity:.12;position:absolute;top:-20px;left:32px;line-height:1;pointer-events:none}
+.mission-quote blockquote{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-style:italic;font-weight:300;line-height:1.55;color:var(--cream);border-left:2px solid var(--gold);padding-left:24px}
+.mission-quote cite{display:block;margin-top:18px;padding-left:24px;font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:2px;color:var(--gold)}
+
+/* VALUES */
+.values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:60px}
+.val-box{background:var(--navy2);padding:52px 40px;position:relative;overflow:hidden;transition:background .3s}
+.val-box::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .5s;transform-origin:left}
+.val-box:hover{background:var(--navy3)}.val-box:hover::after{transform:scaleX(1)}
+.val-num{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:3px;color:var(--gold);margin-bottom:22px;opacity:.7}
+.val-icon{font-size:2.2rem;margin-bottom:20px;display:block;filter:drop-shadow(0 0 14px rgba(201,168,76,0.25))}
+.val-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--cream);margin-bottom:14px}
+.val-desc{font-size:.88rem;line-height:1.75;color:var(--text-muted)}
+
+/* TIMELINE */
+.timeline{position:relative;margin-top:70px;padding-left:60px}
+.timeline::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--gold),rgba(201,168,76,0.06))}
+.tl-item{position:relative;margin-bottom:60px}
+.tl-item:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-68px;top:5px;width:16px;height:16px;border:1.5px solid var(--gold);background:var(--navy);display:flex;align-items:center;justify-content:center}
+.tl-dot::after{content:'';width:5px;height:5px;background:var(--gold);border-radius:50%}
+.tl-year{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:3px;color:var(--gold);margin-bottom:10px;text-transform:uppercase}
+.tl-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--cream);margin-bottom:10px}
+.tl-body{font-size:.9rem;line-height:1.8;color:var(--text-muted);max-width:680px}
+
+/* TEAM */
+.team-intro{max-width:600px;margin-bottom:60px}
+.team-intro p{font-size:.97rem;line-height:1.85;color:var(--text-muted)}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+.tm-card{background:var(--navy2);padding:40px 32px;transition:background .25s;position:relative;overflow:hidden}
+.tm-card:hover{background:var(--navy3)}
+.tm-avatar{width:66px;height:66px;border:1px solid var(--gold);background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:var(--gold);margin-bottom:22px}
+.tm-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:300;color:var(--cream);margin-bottom:5px}
+.tm-title{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.tm-bio{font-size:.82rem;line-height:1.65;color:var(--text-muted)}
+
+/* TRANSPARENCY */
+.trans-grid{display:grid;grid-template-columns:1fr 1fr;gap:76px;align-items:start}
+.trans-text p{font-size:.97rem;line-height:1.85;color:var(--text-muted);margin-bottom:20px}
+.doc-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);margin-top:36px}
+.doc-item{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:20px 26px;border-bottom:1px solid var(--border-light);transition:background .2s}
+.doc-item:last-child{border-bottom:none}.doc-item:hover{background:rgba(201,168,76,0.04)}
+.doc-info{display:flex;align-items:center;gap:16px}
+.doc-icon{font-size:1.3rem;color:var(--gold);flex-shrink:0}
+.doc-name{font-size:.9rem;font-weight:600;color:var(--cream);display:block;margin-bottom:2px}
+.doc-meta{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted)}
+.doc-link{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid var(--border);padding:7px 15px;transition:all .2s;white-space:nowrap;cursor:none}
+.doc-link:hover{border-color:var(--gold);background:var(--gold-dim)}
+.ratings-box{padding:44px;border:1px solid var(--border);background:linear-gradient(135deg,rgba(201,168,76,0.06),transparent)}
+.ratings-box h3{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--cream);margin-bottom:8px}
+.ratings-box p{font-size:.88rem;line-height:1.75;color:var(--text-muted);margin-bottom:30px}
+.rating-row{display:flex;align-items:center;gap:20px;padding:16px 0;border-bottom:1px solid var(--border-light)}
+.rating-row:last-child{border-bottom:none}
+.rating-org{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);min-width:140px}
+.rating-stars{display:flex;gap:4px}
+.star{font-size:.9rem;color:var(--gold)}
+.rating-badge{padding:4px 12px;background:rgba(61,200,100,0.1);border:1px solid rgba(61,200,100,0.25);font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:#5bcf80}
+
+/* CTA */
+.cta-inner{max-width:700px;margin:0 auto;text-align:center}
+.cta-inner p{font-size:1rem;line-height:1.8;color:var(--text-muted);margin-bottom:40px}
+.cta-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
+/* ================================================================
+   CONTACT PAGE STYLES
+   ================================================================ */
+
+.contact-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:90px;align-items:start}
+.channel-list{display:flex;flex-direction:column;gap:0;margin-top:44px}
+.channel{display:flex;align-items:flex-start;gap:22px;padding:28px 0;border-bottom:1px solid var(--border-light);transition:all .2s}
+.channel:first-child{border-top:1px solid var(--border-light)}
+.channel:hover .ch-icon{color:var(--gold2)}
+.ch-icon{font-size:1.6rem;flex-shrink:0;color:var(--gold);margin-top:3px;transition:color .2s;width:36px;text-align:center}
+.ch-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px}
+.ch-value{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:var(--cream);margin-bottom:5px}
+.ch-value a{color:var(--cream);text-decoration:none;transition:color .2s;cursor:none}
+.ch-value a:hover{color:var(--gold2)}
+.ch-note{font-size:.82rem;line-height:1.6;color:var(--text-muted)}
+.response-box{margin-top:44px;padding:32px;border:1px solid var(--border);background:linear-gradient(135deg,rgba(201,168,76,0.06),transparent)}
+.response-box h4{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.rt-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-light)}
+.rt-row:last-child{border-bottom:none}
+.rt-type{font-size:.86rem;color:var(--text-muted)}
+.rt-time{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:1px;color:var(--cream)}
+.form-card{border:1px solid var(--border);background:var(--card-bg)}
+.form-head{padding:32px 44px 28px;background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.02));border-bottom:1px solid var(--border)}
+.form-head h3{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--cream);margin-bottom:6px}
+.form-head p{font-size:.78rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.form-body{padding:38px 44px}
+.f-grp-c{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+.f-grp-c label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.f-grp-c input,.f-grp-c select,.f-grp-c textarea{background:rgba(240,234,216,0.04);border:1px solid var(--border-light);padding:13px 16px;color:var(--cream);font-family:'Syne',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s,background .2s;resize:vertical;width:100%}
+.f-grp-c input:focus,.f-grp-c select:focus,.f-grp-c textarea:focus{border-color:var(--gold);background:rgba(201,168,76,0.04)}
+.f-grp-c select option{background:var(--navy2);color:var(--cream)}
+.f-grp-c input::placeholder,.f-grp-c textarea::placeholder{color:var(--text-muted)}
+.f-row-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.submit-btn{width:100%;padding:17px;background:var(--gold);color:var(--navy);border:none;font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;cursor:none;transition:all .25s;margin-top:6px}
+.submit-btn:hover{background:var(--gold2);transform:translateY(-2px)}
+.form-note{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);text-align:center;margin-top:14px}
+.form-success{display:none;text-align:center;padding:50px 20px}
+.form-success.show{display:block}
+.form-success .success-icon{font-size:3rem;margin-bottom:22px;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.form-success h3{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);margin-bottom:12px}
+.form-success p{font-size:.9rem;line-height:1.75;color:var(--text-muted)}
+.dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:56px}
+.dept-box{background:var(--navy2);padding:44px 36px;transition:background .3s;position:relative;overflow:hidden}
+.dept-box::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .5s;transform-origin:left}
+.dept-box:hover{background:var(--navy3)}.dept-box:hover::after{transform:scaleX(1)}
+.dept-icon{font-size:2rem;margin-bottom:18px;display:block;filter:drop-shadow(0 0 12px rgba(201,168,76,0.25))}
+.dept-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:var(--cream);margin-bottom:10px}
+.dept-desc{font-size:.84rem;line-height:1.7;color:var(--text-muted);margin-bottom:18px}
+.dept-email{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:1px;color:var(--gold);text-decoration:none;word-break:break-all;transition:color .2s;cursor:none}
+.dept-email:hover{color:var(--gold2)}
+.loc-grid{display:grid;grid-template-columns:1fr 1fr;gap:76px;align-items:center}
+.loc-text p{font-size:.97rem;line-height:1.85;color:var(--text-muted);margin-bottom:20px}
+.loc-detail{display:flex;gap:16px;align-items:flex-start;padding:18px 0;border-bottom:1px solid var(--border-light)}
+.loc-detail:last-child{border-bottom:none}
+.loc-icon{color:var(--gold);font-size:1.1rem;flex-shrink:0;margin-top:2px;width:24px}
+.loc-info strong{display:block;font-size:.9rem;color:var(--cream);margin-bottom:4px;font-weight:600}
+.loc-info span{font-size:.84rem;color:var(--text-muted);line-height:1.6}
+.map-placeholder{position:relative;height:380px;border:1px solid var(--border);background:var(--navy2);overflow:hidden}
+.map-placeholder::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,0.04),transparent)}
+.map-grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.06) 1px,transparent 1px);background-size:40px 40px}
+.map-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.map-pin-dot{width:18px;height:18px;background:var(--gold);border-radius:50%;margin:0 auto 8px;box-shadow:0 0 0 6px rgba(201,168,76,0.2),0 0 0 12px rgba(201,168,76,0.08);animation:ping 2s ease-in-out infinite}
+@keyframes ping{0%,100%{box-shadow:0 0 0 6px rgba(201,168,76,0.2),0 0 0 12px rgba(201,168,76,0.08)}50%{box-shadow:0 0 0 10px rgba(201,168,76,0.15),0 0 0 22px rgba(201,168,76,0.05)}}
+.map-pin-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:var(--navy2);padding:5px 12px;border:1px solid var(--border)}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media(max-width:1100px){
+  .stats-grid,.about-grid,.apply-grid,.faq-grid,.foot-top,
+  .mission-grid,.trans-grid,.contact-grid,.loc-grid{grid-template-columns:1fr!important;gap:48px!important}
+  .area-pane.active{grid-template-columns:1fr!important;gap:40px!important}
+  .area-meta,.apply-sidebar,.faq-left{position:static!important}
+  .news-grid{grid-template-columns:1fr!important}
+  .grantees-grid{grid-template-columns:1fr 1fr!important}
+  .team-grid{grid-template-columns:1fr 1fr!important}
+  .values-grid{grid-template-columns:1fr!important}
+  .dept-grid{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:768px){
+  #navbar{padding:0 22px}
+  .nav-links,.nav-cta{display:none}
+  .mob-btn{display:block}
+  .sec{padding:72px 22px}
+  #stats,#partners{padding:56px 22px}
+  .about-visual{height:360px}
+  .ab-frame-2{display:none}
+  .grantees-grid{grid-template-columns:1fr!important}
+  .t-slide{padding:0 16px}
+  .nl-form{flex-direction:column}
+  .nl-input{border-right:1px solid var(--border)}
+  .foot-bottom{flex-direction:column;text-align:center}
+  .p-item{border-right:none;border-bottom:1px solid var(--border);width:100%;justify-content:center}
+  .p-item:last-child{border-bottom:none}
+  .app-body,.app-head{padding:26px!important}
+  .f-row{grid-template-columns:1fr!important}
+  .area-tabs{overflow-x:auto}
+  .filter-row{flex-wrap:wrap}
+  .dept-grid{grid-template-columns:1fr!important}
+  .f-row-2{grid-template-columns:1fr!important}
+  .form-head,.form-body{padding:26px!important}
+  .timeline{padding-left:40px}
+  .tl-dot{left:-48px}
+  .team-grid{grid-template-columns:1fr!important}
+}
+
+</style>
+</head>
+<!-- ============================================================
+     HTML BODY
+     ============================================================ -->
+<body>
+<canvas id="starfield"></canvas>
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="curRing"></div>
+
+<!-- ── SHARED NAV ── -->
+<nav id="navbar">
+  <a href="#" class="nav-brand" onclick="showPage('home');return false;"><div class="nav-mark">MF</div>Musk Foundation</a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('about');return false;" id="nav-about">About</a></li>
+    <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('areas').scrollIntoView({behavior:'smooth'}),50);return false;">Focus Areas</a></li>
+    <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('apply').scrollIntoView({behavior:'smooth'}),50);return false;">Apply</a></li>
+    <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('grantees').scrollIntoView({behavior:'smooth'}),50);return false;">Grantees</a></li>
+    <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('news').scrollIntoView({behavior:'smooth'}),50);return false;">News</a></li>
+    <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('faq').scrollIntoView({behavior:'smooth'}),50);return false;">FAQ</a></li>
+    <li><a href="#" onclick="showPage('contact');return false;" id="nav-contact">Contact</a></li>
+  </ul>
+  <a href="#" class="nav-cta" onclick="openModal();return false;">Apply for Grant</a>
+  <button class="mob-btn" onclick="toggleMob()">&#9776;</button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mob-menu">
+  <button class="mob-close" onclick="toggleMob()">&#10005;</button>
+  <a href="#" onclick="showPage('about');toggleMob();return false;">About</a>
+  <a href="#" onclick="showPage('home');toggleMob();setTimeout(()=>document.getElementById('areas').scrollIntoView({behavior:'smooth'}),50);return false;">Focus Areas</a>
+  <a href="#" onclick="showPage('home');toggleMob();setTimeout(()=>document.getElementById('apply').scrollIntoView({behavior:'smooth'}),50);return false;">Apply</a>
+  <a href="#" onclick="showPage('home');toggleMob();setTimeout(()=>document.getElementById('grantees').scrollIntoView({behavior:'smooth'}),50);return false;">Grantees</a>
+  <a href="#" onclick="showPage('home');toggleMob();setTimeout(()=>document.getElementById('news').scrollIntoView({behavior:'smooth'}),50);return false;">News</a>
+  <a href="#" onclick="showPage('home');toggleMob();setTimeout(()=>document.getElementById('faq').scrollIntoView({behavior:'smooth'}),50);return false;">FAQ</a>
+  <a href="#" onclick="showPage('contact');toggleMob();return false;" style="color:var(--gold)">Contact</a>
+  <a href="#" onclick="openModal();toggleMob();return false;" style="color:var(--gold)">Apply for Grant</a>
+</div>
+
+<!-- ================================================================
+     HOME PAGE
+     ================================================================ -->
+<div class="page active" id="page-home">
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-eyebrow">Musk Foundation &mdash; Established 2001</div>
+  <h1 class="hero-h1-lg">Investing in the<br><em>Long Arc</em><br>of Civilization</h1>
+  <p class="hero-sub-sm">Science. Engineering. Education. The Future.</p>
+  <p class="hero-desc">The Musk Foundation provides grants to advance renewable energy research, science and engineering education, the development of safe artificial intelligence, and the protection of the natural world.</p>
+  <div class="hero-btns">
+    <a href="#" class="btn-gold" onclick="openModal();return false;">Apply for a Grant</a>
+    <a href="#" class="btn-outline" onclick="document.getElementById('about-home').scrollIntoView({behavior:'smooth'});return false;">Our Mission</a>
+  </div>
+  <div class="scroll-hint"><div class="scroll-line"></div>Scroll to explore</div>
+</section>
+
+<!-- TICKER -->
+<div id="ticker">
+  <div class="ticker-inner">
+    <div class="t-item"><div class="t-dot"></div>$100M+ Awarded in Grants</div>
+    <div class="t-item"><div class="t-dot"></div>600+ Projects Funded</div>
+    <div class="t-item"><div class="t-dot"></div>40+ Countries Reached</div>
+    <div class="t-item"><div class="t-dot"></div>Next Deadline: March 31, 2026</div>
+    <div class="t-item"><div class="t-dot"></div>6 Core Focus Areas</div>
+    <div class="t-item"><div class="t-dot"></div>Rolling Applications Open</div>
+    <div class="t-item"><div class="t-dot"></div>Grants from $25K to $10M</div>
+    <div class="t-item"><div class="t-dot"></div>$100M+ Awarded in Grants</div>
+    <div class="t-item"><div class="t-dot"></div>600+ Projects Funded</div>
+    <div class="t-item"><div class="t-dot"></div>40+ Countries Reached</div>
+    <div class="t-item"><div class="t-dot"></div>Next Deadline: March 31, 2026</div>
+    <div class="t-item"><div class="t-dot"></div>6 Core Focus Areas</div>
+    <div class="t-item"><div class="t-dot"></div>Rolling Applications Open</div>
+    <div class="t-item"><div class="t-dot"></div>Grants from $25K to $10M</div>
+  </div>
+</div>
+
+<!-- IRAN / MIDDLE EAST CRISIS NOTICE -->
+<div id="crisis-notice">
+  <div class="cn-deco">&#9679;</div>
+  <div class="cn-inner reveal">
+    <div class="cn-badge"><span class="cn-badge-dot"></span>Special Grant Fund</div>
+    <h2 class="cn-title">Standing with <em>Iran</em> &amp;<br>the Middle East</h2>
+    <div class="cn-divider"></div>
+    <p class="cn-body">
+      As a result of the ongoing crisis in Iran, we at the Musk Foundation feel the pain of everyone there and indeed everyone across the Middle East. To this end, we have created a <strong>separate grant fund</strong> to adequately cater to the needs of those in Iran and across the region. Requests from the region will be swiftly attended to. This special grant is designed to assist <strong>businesses and properties destroyed</strong> as a result of the impact experienced.
+    </p>
+    <div class="cn-cta">
+      <a href="#" class="cn-btn" onclick="openModal();return false;">Apply for Crisis Grant</a>
+      <a href="#" class="cn-link">Learn More &#8594;</a>
+    </div>
+  </div>
+</div>
+
+<!-- CRISIS TESTIMONIALS -->
+<section id="crisis-testimonials" style="position:relative;z-index:10;background:var(--navy);border-bottom:1px solid var(--border);padding:90px 60px;">
+  <div class="reveal" style="text-align:center;margin-bottom:56px">
+    <div class="sec-label" style="justify-content:center">Crisis Grant Recipients</div>
+    <h2 class="sec-title">Lives Changed by the <em>Crisis Fund</em></h2>
+  </div>
+  <div class="ct-slider reveal" style="position:relative;overflow:hidden;">
+    <div class="ct-arrows" style="display:flex;justify-content:space-between;position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);pointer-events:none;z-index:5;">
+      <button onclick="prevCT()" style="background:none;border:1px solid var(--border);width:44px;height:44px;cursor:pointer;pointer-events:all;display:flex;align-items:center;justify-content:center;color:var(--gold);transition:all .2s;" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='none'">&#8592;</button>
+      <button onclick="nextCT()" style="background:none;border:1px solid var(--border);width:44px;height:44px;cursor:pointer;pointer-events:all;display:flex;align-items:center;justify-content:center;color:var(--gold);transition:all .2s;" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='none'">&#8594;</button>
+    </div>
+    <div id="ctTrack" style="display:flex;transition:transform .6s cubic-bezier(.25,.46,.45,.94);">
+
+      <div style="min-width:100%;padding:0 100px;text-align:center;">
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:300;font-style:italic;line-height:1.6;color:var(--cream);margin-bottom:36px;position:relative;">
+          Our bakery in Tehran was completely destroyed in the unrest. I had no idea where to turn. A friend told me about the Musk Foundation crisis fund and I applied online within minutes. Within two weeks I received $18,000 to rebuild. My family is back on its feet and my children are eating again. I will never forget this kindness.
+        </p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="font-size:.92rem;font-weight:700;color:var(--cream);">Farida Nouri</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);">Small Business Owner</div>
+          <div style="font-size:.8rem;color:var(--text-muted);">Tehran, Iran &mdash; Crisis Grant Recipient 2025</div>
+        </div>
+      </div>
+
+      <div style="min-width:100%;padding:0 100px;text-align:center;">
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:300;font-style:italic;line-height:1.6;color:var(--cream);margin-bottom:36px;">
+          My pharmacy was looted and burned during the crisis. The Musk Foundation crisis grant allowed me to restock, repair the storefront, and reopen within a month. What moved me most was the speed — no endless paperwork, no delays. Real help, at the moment it was needed most.
+        </p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="font-size:.92rem;font-weight:700;color:var(--cream);">Hassan Karimi</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);">Pharmacist &amp; Shop Owner</div>
+          <div style="font-size:.8rem;color:var(--text-muted);">Isfahan, Iran &mdash; Crisis Grant Recipient 2025</div>
+        </div>
+      </div>
+
+      <div style="min-width:100%;padding:0 100px;text-align:center;">
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:300;font-style:italic;line-height:1.6;color:var(--cream);margin-bottom:36px;">
+          I lost my tailoring workshop and all my equipment in the violence. As a widow with three children I had no savings and no one to turn to. The crisis grant from the Musk Foundation gave me $12,500 to replace my machines and restart my business. I am sewing again. My children are in school. I feel human again.
+        </p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="font-size:.92rem;font-weight:700;color:var(--cream);">Maryam Sadeghi</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);">Independent Tailor</div>
+          <div style="font-size:.8rem;color:var(--text-muted);">Mashhad, Iran &mdash; Crisis Grant Recipient 2025</div>
+        </div>
+      </div>
+
+      <div style="min-width:100%;padding:0 100px;text-align:center;">
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:300;font-style:italic;line-height:1.6;color:var(--cream);margin-bottom:36px;">
+          Our community library and learning centre in Beirut suffered severe structural damage. We were certain we would have to close permanently. The Musk Foundation crisis fund covered the repairs and allowed us to reopen with new books and computers. Over 400 children use this space every week. You gave them their future back.
+        </p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="font-size:.92rem;font-weight:700;color:var(--cream);">Layla Mansour</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);">Community Centre Director</div>
+          <div style="font-size:.8rem;color:var(--text-muted);">Beirut, Lebanon &mdash; Crisis Grant Recipient 2025</div>
+        </div>
+      </div>
+
+      <div style="min-width:100%;padding:0 100px;text-align:center;">
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:300;font-style:italic;line-height:1.6;color:var(--cream);margin-bottom:36px;">
+          My family has run a small printing press in Tabriz for thirty years. The crisis destroyed our machines and our livelihood in one night. The Musk Foundation responded to my application in days. The grant we received meant we did not have to sell our home. We are printing again. Our employees still have jobs. Thank you from the bottom of our hearts.
+        </p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="font-size:.92rem;font-weight:700;color:var(--cream);">Reza Ahmadi</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);">Print Shop Owner</div>
+          <div style="font-size:.8rem;color:var(--text-muted);">Tabriz, Iran &mdash; Crisis Grant Recipient 2025</div>
+        </div>
+      </div>
+
+    </div>
+    <!-- Dots -->
+    <div style="display:flex;justify-content:center;gap:10px;margin-top:44px;">
+      <button class="ct-dot active" onclick="goCT(0)" style="width:26px;height:8px;border-radius:4px;background:var(--gold);border:none;cursor:pointer;transition:all .25s;"></button>
+      <button class="ct-dot" onclick="goCT(1)" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted);border:none;cursor:pointer;transition:all .25s;"></button>
+      <button class="ct-dot" onclick="goCT(2)" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted);border:none;cursor:pointer;transition:all .25s;"></button>
+      <button class="ct-dot" onclick="goCT(3)" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted);border:none;cursor:pointer;transition:all .25s;"></button>
+      <button class="ct-dot" onclick="goCT(4)" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted);border:none;cursor:pointer;transition:all .25s;"></button>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats" class="sec">
+  <div class="stats-grid">
+    <div class="s-box reveal"><div class="s-num" data-target="100" data-prefix="$" data-suffix="M+">$0M+</div><div class="s-lbl">Total Grants Awarded</div><div class="s-sub">Across all focus areas since 2001</div></div>
+    <div class="s-box reveal d1"><div class="s-num" data-target="600" data-suffix="+">0+</div><div class="s-lbl">Projects Funded</div><div class="s-sub">Research, education &amp; innovation</div></div>
+    <div class="s-box reveal d2"><div class="s-num" data-target="40" data-suffix="+">0+</div><div class="s-lbl">Countries Reached</div><div class="s-sub">Global impact across 6 continents</div></div>
+    <div class="s-box reveal d3"><div class="s-num" data-target="24" data-suffix=" yrs">0 yrs</div><div class="s-lbl">Years of Philanthropy</div><div class="s-sub">Committed to civilizational progress</div></div>
+  </div>
+</section>
+
+<!-- ABOUT (home) -->
+<section id="about-home" class="sec">
+  <div class="about-grid">
+    <div class="about-visual reveal">
+      <div class="ab-frame ab-frame-1">
+        <div class="ab-inner">
+          <div class="ab-quote">"The purpose of the Foundation is to accelerate the transition to sustainable energy, advance science education, and ensure AI remains safe and beneficial."<cite>&mdash; Foundation Charter, 2001</cite></div>
+          <div class="pillars">
+            <div class="pill"><span class="pill-n">01</span><div><div class="pill-t">Civilizational Thinking</div><div class="pill-d">We fund work with 50-year horizons, not quarterly cycles.</div></div></div>
+            <div class="pill"><span class="pill-n">02</span><div><div class="pill-t">Radical Ambition</div><div class="pill-d">Incremental work finds other funders. We back the transformative.</div></div></div>
+            <div class="pill"><span class="pill-n">03</span><div><div class="pill-t">Open Science</div><div class="pill-d">Knowledge advances fastest when findings are shared freely.</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ab-frame ab-frame-2"></div>
+    </div>
+    <div class="reveal d2">
+      <div class="sec-label">Our Mission</div>
+      <h2 class="sec-title">Built for<br><em>Humanity's</em><br>Best Outcomes</h2>
+      <div class="divider"></div>
+      <div class="about-text">
+        <p>The Musk Foundation was established with a simple conviction: that private capital deployed with bold ambition can unlock scientific and educational progress that traditional funding structures cannot.</p>
+        <p>We operate in the space between too risky for government grants and too long-horizon for venture capital. We back researchers, educators, and builders working on problems that will matter enormously in 25 years.</p>
+        <p>Our grantees have pioneered next-generation solar cells, built educational platforms reaching tens of millions of students, advanced AI alignment science, and developed breakthrough treatments for rare pediatric diseases.</p>
+      </div>
+      <div class="founder-box">
+        <div class="f-avatar">E</div>
+        <div class="f-info"><h4>Elon Musk, Founder</h4><p>Entrepreneur &middot; Engineer &middot; Philanthropist</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOCUS AREAS -->
+<section id="areas" class="sec" style="background:var(--navy2)">
+  <div class="reveal">
+    <div class="sec-label">Focus Areas</div>
+    <h2 class="sec-title">Where We <em>Invest</em></h2>
+    <div class="divider"></div>
+  </div>
+  <div class="area-tabs reveal">
+    <button class="a-tab active" onclick="switchArea('energy',this)">&#9889; Energy</button>
+    <button class="a-tab" onclick="switchArea('edu',this)">&#128300; Education</button>
+    <button class="a-tab" onclick="switchArea('ai',this)">&#129504; Safe AI</button>
+    <button class="a-tab" onclick="switchArea('health',this)">&#129516; Health</button>
+    <button class="a-tab" onclick="switchArea('space',this)">&#128640; Space</button>
+    <button class="a-tab" onclick="switchArea('env',this)">&#127757; Environment</button>
+  </div>
+
+  <div class="area-pane active" id="area-energy">
+    <div class="area-meta">
+      <span class="area-icon">&#9889;</span>
+      <div class="area-name">Renewable Energy</div>
+      <div class="area-badge">$50,000 &ndash; $5,000,000 per grant</div>
+      <p class="area-body">The transition to sustainable energy is the defining challenge of the 21st century. We fund foundational research in solar, wind, battery storage, grid modernization, and clean fuels.</p>
+      <a href="#" class="btn-gold" onclick="openModal();return false;">Apply in This Area</a>
+    </div>
+    <div class="exa-list">
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Perovskite Solar Research</strong>Next-generation photovoltaic materials targeting 45%+ conversion efficiency at manufacturing scale.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Grid-Scale Battery Storage</strong>Long-duration storage enabling 24/7 renewable power without fossil fuel backup.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Green Hydrogen Production</strong>Low-cost electrolysis techniques for industrial decarbonization pathways.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Smart Grid Modeling</strong>AI-driven grid optimization enabling 95%+ renewable penetration without curtailment.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Ocean &amp; Tidal Energy</strong>Emerging marine energy capture technologies for coastal communities worldwide.</div></div>
+    </div>
+  </div>
+
+  <div class="area-pane" id="area-edu">
+    <div class="area-meta">
+      <span class="area-icon">&#128300;</span>
+      <div class="area-name">Science &amp; Engineering Education</div>
+      <div class="area-badge">$25,000 &ndash; $2,000,000 per grant</div>
+      <p class="area-body">Every breakthrough depends on the minds behind it. We fund programs that build scientific and engineering literacy, especially for underserved and underrepresented communities globally.</p>
+      <a href="#" class="btn-gold" onclick="openModal();return false;">Apply in This Area</a>
+    </div>
+    <div class="exa-list">
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Adaptive Learning Platforms</strong>AI-powered personalized STEM tools for students in low-resource settings.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>STEM Teacher Training</strong>Professional development for science and math educators in underserved districts.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Research Fellowships</strong>PhD fellowships for engineers and scientists from first-generation college families.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Maker &amp; Robotics Labs</strong>Hands-on engineering labs in Title I public schools across the United States.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Open Curriculum Development</strong>Freely available, high-quality K-12 science curricula in 50+ languages.</div></div>
+    </div>
+  </div>
+
+  <div class="area-pane" id="area-ai">
+    <div class="area-meta">
+      <span class="area-icon">&#129504;</span>
+      <div class="area-name">Safe Artificial Intelligence</div>
+      <div class="area-badge">$100,000 &ndash; $10,000,000 per grant</div>
+      <p class="area-body">AI may be the most consequential technology in human history. We fund research ensuring AI systems are interpretable, aligned with human values, and governed by robust policy frameworks.</p>
+      <a href="#" class="btn-gold" onclick="openModal();return false;">Apply in This Area</a>
+    </div>
+    <div class="exa-list">
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Interpretability Research</strong>Tools that allow humans to understand what neural networks are actually computing.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Alignment Techniques</strong>Mathematical frameworks for specifying and verifying AI goal alignment with human intent.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>AI Governance Policy</strong>Evidence-based policy research informing domestic and international AI regulation.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Robustness &amp; Security</strong>Making AI systems robust against adversarial manipulation and distribution shift.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Societal Impact Research</strong>Studying AI's effects on labor markets, information ecosystems, and democratic institutions.</div></div>
+    </div>
+  </div>
+
+  <div class="area-pane" id="area-health">
+    <div class="area-meta">
+      <span class="area-icon">&#129516;</span>
+      <div class="area-name">Pediatric Health</div>
+      <div class="area-badge">$75,000 &ndash; $3,000,000 per grant</div>
+      <p class="area-body">Rare pediatric diseases affect millions of families while receiving a fraction of research investment directed at adult conditions. We fund gene therapy, early-diagnosis tools, and translational research.</p>
+      <a href="#" class="btn-gold" onclick="openModal();return false;">Apply in This Area</a>
+    </div>
+    <div class="exa-list">
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Gene Therapy for Rare Diseases</strong>CRISPR and viral vector approaches for pediatric neurological conditions.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Newborn Screening Expansion</strong>Genomic screening for early detection of treatable metabolic disorders.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Pediatric Oncology Research</strong>Novel immunotherapy approaches for childhood cancers with poor prognoses.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Neurological Development</strong>Research into autism spectrum conditions, cerebral palsy, and early intervention.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Global Child Health</strong>Vaccine distribution systems and malnutrition treatment in developing nations.</div></div>
+    </div>
+  </div>
+
+  <div class="area-pane" id="area-space">
+    <div class="area-meta">
+      <span class="area-icon">&#128640;</span>
+      <div class="area-name">Space &amp; Exploration</div>
+      <div class="area-badge">$50,000 &ndash; $4,000,000 per grant</div>
+      <p class="area-body">Understanding the universe and establishing humanity's presence beyond Earth are among the greatest long-term imperatives we face. We support fundamental astrophysics and planetary science.</p>
+      <a href="#" class="btn-gold" onclick="openModal();return false;">Apply in This Area</a>
+    </div>
+    <div class="exa-list">
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Astrophysics Research</strong>Observational and theoretical work in cosmology, exoplanet science, and astrobiology.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Space Science Education</strong>Planetarium programs, astronomy curricula, and telescope access for underserved schools.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Technosignature Research</strong>SETI programs using advanced ML signal detection across radio and optical spectra.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Planetary Defense</strong>Asteroid detection, tracking, and deflection mission research and advocacy.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Space Medicine</strong>Human health research for long-duration spaceflight and extraterrestrial habitation.</div></div>
+    </div>
+  </div>
+
+  <div class="area-pane" id="area-env">
+    <div class="area-meta">
+      <span class="area-icon">&#127757;</span>
+      <div class="area-name">Environment &amp; Conservation</div>
+      <div class="area-badge">$25,000 &ndash; $2,000,000 per grant</div>
+      <p class="area-body">Earth's biodiversity and natural systems are the substrate of all human civilization. We fund applied conservation science, ecosystem restoration, and planetary health monitoring technology.</p>
+      <a href="#" class="btn-gold" onclick="openModal();return false;">Apply in This Area</a>
+    </div>
+    <div class="exa-list">
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Coral Reef Restoration</strong>Heat-resistant coral cultivation and assisted evolution programs for reef systems.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Biodiversity Monitoring</strong>eDNA and satellite-based systems for real-time global biodiversity tracking.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Reforestation Science</strong>Native species selection algorithms and drone-based reforestation at scale.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Ocean Plastic Research</strong>Biodegradable material alternatives and ocean cleanup technology development.</div></div>
+      <div class="exa"><span class="exa-arrow">&#8594;</span><div class="exa-t"><strong>Carbon Sequestration</strong>Soil carbon, biochar, and enhanced weathering for durable CO&#8322; removal.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO APPLY -->
+<section id="apply" class="sec">
+  <div class="apply-grid">
+    <div>
+      <div class="reveal">
+        <div class="sec-label">Application Process</div>
+        <h2 class="sec-title">How to <em>Apply</em></h2>
+        <div class="divider"></div>
+        <p style="font-size:.93rem;line-height:1.8;color:var(--text-muted);margin-bottom:44px">We accept applications on a rolling basis with quarterly review cycles. We fund nonprofits, universities, research institutions, and in rare cases, exceptional individuals. We do not fund for-profit entities.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-n-wrap"><span class="step-n">I</span></div>
+          <div class="step-body">
+            <h3>Letter of Inquiry</h3>
+            <p>Submit a concise two-page letter describing your project, team, estimated budget, and expected impact.</p>
+            <span class="step-tag">2 pages max &middot; PDF preferred</span>
+          </div>
+        </div>
+        <div class="step reveal d1">
+          <div class="step-n-wrap"><span class="step-n">II</span></div>
+          <div class="step-body">
+            <h3>Initial Review</h3>
+            <p>Our program team reviews all letters within 6-8 weeks. About 15% of LOIs are invited to full proposals.</p>
+            <span class="step-tag">6&ndash;8 week turnaround</span>
+          </div>
+        </div>
+        <div class="step reveal d2">
+          <div class="step-n-wrap"><span class="step-n">III</span></div>
+          <div class="step-body">
+            <h3>Full Proposal</h3>
+            <p>Invited applicants submit a comprehensive proposal with workplan, budget, team qualifications, and references.</p>
+            <span class="step-tag">Invitation only &middot; 8&ndash;12 pages</span>
+          </div>
+        </div>
+        <div class="step reveal d3">
+          <div class="step-n-wrap"><span class="step-n">IV</span></div>
+          <div class="step-body">
+            <h3>Decision &amp; Grant Agreement</h3>
+            <p>Final decisions within 12 weeks. Approved grants proceed to a grant agreement with milestone-tied tranches.</p>
+            <span class="step-tag">12-week decision &middot; Milestone funding</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="apply-sidebar reveal d2">
+      <div class="elig-card">
+        <div class="elig-title">Eligibility Checklist</div>
+        <div class="elig-item"><span class="elig-icon">&#10003;</span>U.S.-based 501(c)(3) or international equivalent</div>
+        <div class="elig-item"><span class="elig-icon">&#10003;</span>Project aligns with at least one focus area</div>
+        <div class="elig-item"><span class="elig-icon">&#10003;</span>Identified qualified principal investigator</div>
+        <div class="elig-item"><span class="elig-icon">&#10003;</span>Track record of impact or credible pathway</div>
+        <div class="elig-item"><span class="elig-icon">&#10003;</span>Transparent budget with clear use-of-funds</div>
+        <div class="elig-item"><span class="elig-icon">&#10003;</span>Commitment to open publication of findings</div>
+        <div class="elig-item"><span class="elig-icon">&#10003;</span>No unresolved legal or compliance issues</div>
+        <div class="elig-item"><span class="elig-icon">&#10003;</span>Not a for-profit company or LLC</div>
+      </div>
+      <div style="margin-top:18px">
+        <a href="#" class="btn-gold" style="display:block;text-align:center" onclick="openModal();return false;">Submit Letter of Inquiry</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GRANTEES -->
+<section id="grantees" class="sec" style="background:var(--navy2)">
+  <div class="reveal" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:22px;margin-bottom:0">
+    <div>
+      <div class="sec-label">Recent Grantees</div>
+      <h2 class="sec-title">Making an <em>Impact</em></h2>
+    </div>
+    <div class="filter-row">
+      <button class="f-btn active" onclick="filterG('all',this)">All</button>
+      <button class="f-btn" onclick="filterG('energy',this)">Energy</button>
+      <button class="f-btn" onclick="filterG('education',this)">Education</button>
+      <button class="f-btn" onclick="filterG('ai',this)">AI</button>
+      <button class="f-btn" onclick="filterG('health',this)">Health</button>
+      <button class="f-btn" onclick="filterG('space',this)">Space</button>
+    </div>
+  </div>
+  <div class="grantees-grid" id="gGrid">
+    <div class="gc reveal" data-cat="education"><div class="gc-year">2025<span class="gc-status active">Active</span></div><div class="gc-org">Khan Academy</div><p class="gc-proj">Expanding AI-powered personalized learning to 50M students across sub-Saharan Africa, with offline capabilities for low-bandwidth environments.</p><div class="gc-amt">$5,000,000</div><span class="gc-tag">Education</span></div>
+    <div class="gc reveal d1" data-cat="energy"><div class="gc-year">2025<span class="gc-status active">Active</span></div><div class="gc-org">MIT Energy Initiative</div><p class="gc-proj">Next-generation perovskite solar cell research targeting 40%+ conversion rates, focused on manufacturability and long-term stability.</p><div class="gc-amt">$2,400,000</div><span class="gc-tag">Renewable Energy</span></div>
+    <div class="gc reveal d2" data-cat="ai"><div class="gc-year">2024<span class="gc-status done">Completed</span></div><div class="gc-org">Stanford HAI</div><p class="gc-proj">Interpretability tools that allow humans to understand the internal workings of large language models.</p><div class="gc-amt">$3,750,000</div><span class="gc-tag">Safe AI</span></div>
+    <div class="gc reveal" data-cat="health"><div class="gc-year">2024<span class="gc-status done">Completed</span></div><div class="gc-org">Boston Children's Hospital</div><p class="gc-proj">Gene therapy for pediatric-onset Batten disease &mdash; a rare, fatal neurodegenerative condition affecting children aged 2-10.</p><div class="gc-amt">$1,800,000</div><span class="gc-tag">Pediatric Health</span></div>
+    <div class="gc reveal d1" data-cat="space"><div class="gc-year">2024<span class="gc-status active">Active</span></div><div class="gc-org">SETI Institute</div><p class="gc-proj">Technosignature search program leveraging next-generation radio telescope arrays and machine learning-based signal detection.</p><div class="gc-amt">$900,000</div><span class="gc-tag">Space</span></div>
+    <div class="gc reveal d2" data-cat="energy"><div class="gc-year">2024<span class="gc-status done">Completed</span></div><div class="gc-org">Princeton Plasma Physics Lab</div><p class="gc-proj">Compact fusion reactor diagnostics research enabling faster iteration cycles for private fusion energy development.</p><div class="gc-amt">$2,100,000</div><span class="gc-tag">Renewable Energy</span></div>
+    <div class="gc reveal" data-cat="education"><div class="gc-year">2023<span class="gc-status done">Completed</span></div><div class="gc-org">Code.org</div><p class="gc-proj">Computer science curriculum for 10,000+ high schools in the U.S., focusing on underserved communities.</p><div class="gc-amt">$1,500,000</div><span class="gc-tag">Education</span></div>
+    <div class="gc reveal d1" data-cat="health"><div class="gc-year">2023<span class="gc-status done">Completed</span></div><div class="gc-org">St. Jude Children's Research</div><p class="gc-proj">Immunotherapy trial for pediatric glioblastoma combining CAR-T with checkpoint inhibition.</p><div class="gc-amt">$2,800,000</div><span class="gc-tag">Pediatric Health</span></div>
+    <div class="gc reveal d2" data-cat="ai"><div class="gc-year">2023<span class="gc-status active">Active</span></div><div class="gc-org">Center for Human-Compatible AI</div><p class="gc-proj">Formal verification methods for neural network safety properties and mathematical proofs of alignment.</p><div class="gc-amt">$4,200,000</div><span class="gc-tag">Safe AI</span></div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section id="news" class="sec">
+  <div class="reveal" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:22px;margin-bottom:44px">
+    <div><div class="sec-label">News &amp; Updates</div><h2 class="sec-title">From the <em>Foundation</em></h2></div>
+    <a href="#" class="btn-outline">View All Updates</a>
+  </div>
+  <div class="news-grid">
+    <div class="n-card feat reveal">
+      <div class="n-cat">Foundation News</div>
+      <h3 class="n-title">Musk Foundation Announces $25M AI Safety Initiative for 2026</h3>
+      <p class="n-excerpt">A new multi-year initiative will fund interpretability research, governance policy development, and international coordination on AI safety standards.</p>
+      <div class="n-meta"><span>February 10, 2026</span><a href="#" class="n-read">Read More &#8594;</a></div>
+    </div>
+    <div class="n-card reveal d1">
+      <div class="n-cat">Grantee Spotlight</div>
+      <h3 class="n-title">MIT Solar Lab Achieves Record 38.4% Efficiency</h3>
+      <p class="n-excerpt">Foundation-funded researchers report a new world record in perovskite tandem solar cell efficiency.</p>
+      <div class="n-meta"><span>Jan 28, 2026</span><a href="#" class="n-read">Read &#8594;</a></div>
+    </div>
+    <div class="n-card reveal d2">
+      <div class="n-cat">Annual Report</div>
+      <h3 class="n-title">2025 Annual Report: Impact Across Six Continents</h3>
+      <p class="n-excerpt">$18.4M deployed across 47 new grants in 2025, with a full breakdown of outcomes across all focus areas.</p>
+      <div class="n-meta"><span>Jan 15, 2026</span><a href="#" class="n-read">Read &#8594;</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="sec" style="background:var(--navy2)">
+  <div class="reveal" style="text-align:center;margin-bottom:60px">
+    <div class="sec-label" style="justify-content:center">What Grantees Say</div>
+    <h2 class="sec-title">Voices from the <em>Field</em></h2>
+  </div>
+  <div class="t-slider reveal">
+    <div class="t-arrows">
+      <button class="t-arrow" onclick="prevT()">&#8592;</button>
+      <button class="t-arrow" onclick="nextT()">&#8594;</button>
+    </div>
+    <div class="t-track" id="tTrack">
+      <div class="t-slide">
+        <p class="t-quote">The Musk Foundation didn't just fund our research &mdash; they gave us the freedom to pursue the hardest version of the problem. That kind of trust from a funder is extraordinarily rare.</p>
+        <div class="t-author"><div class="t-name">Dr. Sarah Chen</div><div class="t-role">Principal Investigator</div><div class="t-org">MIT Energy Initiative &mdash; Perovskite Solar Program</div></div>
+      </div>
+      <div class="t-slide">
+        <p class="t-quote">Working with the Musk Foundation meant our AI safety research wasn't constrained by short funding cycles. We could follow the science wherever it led.</p>
+        <div class="t-author"><div class="t-name">Prof. Marcus Williams</div><div class="t-role">Director</div><div class="t-org">Center for Human-Compatible AI, UC Berkeley</div></div>
+      </div>
+      <div class="t-slide">
+        <p class="t-quote">Because of this grant, we've now reached over 8 million students in 23 countries who had never had access to quality science education. The Foundation believed in our model when it was just a pilot.</p>
+        <div class="t-author"><div class="t-name">Amara Osei</div><div class="t-role">CEO &amp; Co-Founder</div><div class="t-org">AfricaSTEM &mdash; Education Initiative</div></div>
+      </div>
+      <div class="t-slide">
+        <p class="t-quote">The gene therapy trial we ran with Musk Foundation funding led directly to an FDA breakthrough therapy designation. Without that initial philanthropic risk, this treatment would be years away.</p>
+        <div class="t-author"><div class="t-name">Dr. James Okafor, MD, PhD</div><div class="t-role">Chief of Pediatric Neurology</div><div class="t-org">Boston Children's Hospital</div></div>
+      </div>
+    </div>
+    <div class="t-dots">
+      <button class="t-dot-btn active" onclick="goT(0)"></button>
+      <button class="t-dot-btn" onclick="goT(1)"></button>
+      <button class="t-dot-btn" onclick="goT(2)"></button>
+      <button class="t-dot-btn" onclick="goT(3)"></button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="sec">
+  <div class="faq-grid">
+    <div class="faq-left reveal">
+      <div class="sec-label">FAQ</div>
+      <h2 class="sec-title">Common <em>Questions</em></h2>
+      <div class="divider"></div>
+      <p>Can't find what you're looking for? Reach out directly &mdash; our program staff respond within 5 business days.</p>
+      <div class="faq-contact">
+        <p>For application inquiries, partnerships, or press:</p>
+        <a href="/cdn-cgi/l/email-protection#8aedf8ebe4fef9cae7fff9e1ece5ffe4eeebfee3e5e4a4e5f8ed" class="btn-outline" style="font-size:.68rem;padding:11px 22px;display:inline-block"><span class="__cf_email__" data-cfemail="eb8c998a859f98ab869e98808d849e858f8a9f828485c584998c">[email&#160;protected]</span></a>
+      </div>
+    </div>
+    <div class="faq-list reveal d1">
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>Does the Foundation accept unsolicited proposals?</span><div class="faq-tog">+</div></button><div class="faq-ans">We accept Letters of Inquiry on a rolling basis. Only organizations formally invited following LOI review may submit full proposals. Unsolicited full proposals are not reviewed.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>Are international organizations eligible?</span><div class="faq-tog">+</div></button><div class="faq-ans">Yes. We actively fund organizations globally. International applicants must demonstrate legal equivalency to a U.S. 501(c)(3) in their jurisdiction. We have funded projects in over 40 countries.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>What is the typical grant size and duration?</span><div class="faq-tog">+</div></button><div class="faq-ans">Grants range from $25,000 to $10,000,000 depending on focus area and scope. Most grants run 12-36 months. Multi-year grants are renewable based on milestone achievement.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>Does the Foundation require naming rights or acknowledgment?</span><div class="faq-tog">+</div></button><div class="faq-ans">No. We do not require naming rights, branding, or public acknowledgment as a condition of funding. Acknowledgment in publications is welcome but never required.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>Can for-profit companies apply?</span><div class="faq-tog">+</div></button><div class="faq-ans">In general, we do not fund for-profit entities. We make very limited exceptions for Benefit Corporations when the work is clearly non-commercial in nature.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>How are grantees monitored and evaluated?</span><div class="faq-tog">+</div></button><div class="faq-ans">All grantees submit semi-annual narrative and financial reports. Program staff conduct site visits for grants over $1M. Milestone-based disbursement means funding is tied to demonstrable progress.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>Can individual researchers apply?</span><div class="faq-tog">+</div></button><div class="faq-ans">Direct individual grants are rare and reserved for exceptional circumstances. We strongly recommend applying through an affiliated university or research institution.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>Does the Foundation fund overhead and indirect costs?</span><div class="faq-tog">+</div></button><div class="faq-ans">Yes. We accept indirect cost rates up to 25% of direct costs for established institutions. Rates above 25% require justification.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section id="newsletter" class="sec" style="background:linear-gradient(160deg,var(--navy3),var(--navy2));border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-top:90px;padding-bottom:90px">
+  <div class="nl-inner reveal">
+    <div class="sec-label" style="justify-content:center">Stay Informed</div>
+    <h2 class="sec-title">Foundation <em>Updates</em></h2>
+    <div class="divider" style="margin:22px auto"></div>
+    <p>Receive quarterly grant announcements, grantee spotlights, application deadline reminders, and news from the world of science and philanthropy.</p>
+    <div class="nl-form">
+      <input type="email" class="nl-input" placeholder="your@email.com" id="nlEmail">
+      <button class="nl-btn" onclick="doSubscribe()">Subscribe</button>
+    </div>
+    <div class="nl-note" id="nlMsg">No spam. Unsubscribe at any time. We send 4-6 emails per year.</div>
+  </div>
+</section>
+
+<!-- PARTNERS -->
+<section id="partners" class="sec" style="background:var(--navy2);border-top:1px solid var(--border);padding-top:70px;padding-bottom:70px">
+  <div class="reveal" style="text-align:center">
+    <div class="sec-label" style="justify-content:center">Trusted By</div>
+    <p style="font-size:.93rem;color:var(--text-muted)">Organizations we've partnered with and funded across our focus areas</p>
+  </div>
+  <div class="partners-row reveal">
+    <div class="p-item">MIT</div>
+    <div class="p-item">Stanford</div>
+    <div class="p-item">Khan Academy</div>
+    <div class="p-item">SETI Institute</div>
+    <div class="p-item">Caltech</div>
+    <div class="p-item">UC Berkeley</div>
+    <div class="p-item">St. Jude</div>
+  </div>
+</section>
+
+<!-- MESSAGE FORM (home footer) -->
+<div class="fmsg" id="footMsgSection">
+  <h3>Send a Message</h3>
+  <p class="fmsg-sub">Questions about grants, eligibility, or the Foundation? We read every message.</p>
+  <div id="fmsgForm">
+    <div class="fmsg-grid">
+      <div class="fmsg-field full">
+        <label>Full Name</label>
+        <input type="text" id="fmsg-fullname" placeholder="Your full name">
+      </div>
+      <div class="fmsg-field">
+        <label>Your Country</label>
+        <input type="text" id="fmsg-country" placeholder="Country of residence">
+      </div>
+      <div class="fmsg-field">
+        <label>Address</label>
+        <input type="text" id="fmsg-address" placeholder="Your address">
+      </div>
+      <div class="fmsg-field">
+        <label>Age</label>
+        <input type="number" id="fmsg-age" placeholder="Your age" min="18">
+      </div>
+      <div class="fmsg-field">
+        <label>Occupation</label>
+        <input type="text" id="fmsg-occupation" placeholder="Your occupation">
+      </div>
+      <div class="fmsg-field">
+        <label>Cell Number</label>
+        <input type="tel" id="fmsg-cell" placeholder="Your phone number">
+      </div>
+      <div class="fmsg-field">
+        <label>Marital Status</label>
+        <select id="fmsg-marital" style="background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);padding:11px 14px;color:var(--cream);font-family:'Syne',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;width:100%">
+          <option value="" style="background:var(--navy2)">Select status</option>
+          <option value="single" style="background:var(--navy2)">Single</option>
+          <option value="married" style="background:var(--navy2)">Married</option>
+          <option value="divorced" style="background:var(--navy2)">Divorced</option>
+          <option value="widowed" style="background:var(--navy2)">Widowed</option>
+        </select>
+      </div>
+      <div class="fmsg-field">
+        <label>Sex</label>
+        <select id="fmsg-sex" style="background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);padding:11px 14px;color:var(--cream);font-family:'Syne',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;width:100%">
+          <option value="" style="background:var(--navy2)">Select</option>
+          <option value="male" style="background:var(--navy2)">Male</option>
+          <option value="female" style="background:var(--navy2)">Female</option>
+          <option value="other" style="background:var(--navy2)">Other</option>
+          <option value="prefer-not" style="background:var(--navy2)">Prefer not to say</option>
+        </select>
+      </div>
+      <div class="fmsg-field">
+        <label>Monthly Income</label>
+        <input type="text" id="fmsg-income" placeholder="e.g. $2,000 / month">
+      </div>
+      <div class="fmsg-field">
+        <label>Your Religion</label>
+        <input type="text" id="fmsg-religion" placeholder="Your religion">
+      </div>
+      <div class="fmsg-field full">
+        <label>What Would You Do With This Money</label>
+        <textarea id="fmsg-usage" rows="5" placeholder="Describe how you would use the grant funds..."></textarea>
+      </div>
+    </div>
+    <div class="fmsg-actions">
+      <button class="fmsg-btn" onclick="submitFmsg()">Send Message &rarr;</button>
+      <span class="fmsg-note">We respond within 2&ndash;5 business days</span>
+    </div>
+  </div>
+  <div class="fmsg-ok" id="fmsgOk">&#10003;&nbsp; Message sent — we'll be in touch soon.</div>
+</div>
+
+
+<!-- FOOTER (home) -->
+<footer>
+  <div class="foot-top">
+    <div>
+      <span class="foot-brand-em">Musk Foundation</span>
+      <span class="foot-brand-cap">Advancing Human Civilization</span>
+      <p class="foot-about">Providing grants for renewable energy research, science &amp; engineering education, pediatric health, safe AI, and conservation since 2001.</p>
+      <div class="foot-social">
+        <a href="#" class="soc">&#120143;</a>
+        <a href="#" class="soc">in</a>
+        <a href="#" class="soc">&#8853;</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <h4>Foundation</h4>
+      <ul>
+        <li><a href="#" onclick="showPage('about');return false;">About Us</a></li>
+        <li><a href="#" onclick="showPage('about');return false;">Mission &amp; Values</a></li>
+        <li><a href="#" onclick="showPage('about');return false;">Our Team</a></li>
+        <li><a href="#" onclick="showPage('about');return false;">Annual Reports</a></li>
+        <li><a href="#">Press Kit</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>Grants</h4>
+      <ul>
+        <li><a href="#" onclick="document.getElementById('areas').scrollIntoView({behavior:'smooth'});return false;">Focus Areas</a></li>
+        <li><a href="#" onclick="openModal();return false;">Apply Now</a></li>
+        <li><a href="#" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});return false;">Eligibility</a></li>
+        <li><a href="#" onclick="document.getElementById('grantees').scrollIntoView({behavior:'smooth'});return false;">Current Grantees</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="/cdn-cgi/l/email-protection#c8afbaa9a6bcbb88a5bdbba3aea7bda6aca9bca1a7a6e6a7baaf">Email Us</a></li>
+        <li><a href="#" onclick="showPage('contact');return false;">Contact Page</a></li>
+        <li><a href="#" onclick="showPage('contact');return false;">Press Inquiries</a></li>
+        <li><a href="#" onclick="showPage('contact');return false;">Partnership</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <div class="foot-copy">&copy; 2026 Musk Foundation &middot; EIN 20-3712938 &middot; All rights reserved</div>
+    <div class="foot-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /page-home -->
+
+
+<!-- ================================================================
+     ABOUT PAGE
+     ================================================================ -->
+<div class="page" id="page-about">
+
+<section class="page-hero">
+  <div class="hero-eyebrow">Musk Foundation &mdash; Established 2001</div>
+  <h1 class="hero-h1">Our <em>Story</em> &amp;<br>Conviction</h1>
+  <p class="hero-sub">Private capital. Bold ambition. Civilizational time horizons.</p>
+</section>
+
+<!-- MISSION -->
+<section id="mission" class="sec">
+  <div class="mission-grid">
+    <div class="reveal">
+      <div class="sec-label">Our Mission</div>
+      <h2 class="sec-title">Built for<br><em>Humanity's</em><br>Best Outcomes</h2>
+      <div class="divider"></div>
+      <div class="mission-text">
+        <p>The Musk Foundation was established in 2001 with a simple conviction: that private capital deployed with bold ambition can unlock scientific and educational progress that traditional funding structures cannot.</p>
+        <p>We operate in the space between too risky for government grants and too long-horizon for venture capital. We back researchers, educators, and builders working on problems that will matter enormously in 25 years — not the next quarter.</p>
+        <p>Our grantees have pioneered next-generation solar cells, built educational platforms reaching tens of millions of students, advanced AI alignment science, and developed breakthrough treatments for rare pediatric diseases.</p>
+        <p>We are lean by design. Every dollar not spent on administration is a dollar backing science. We do not hold galas, pursue brand recognition, or fund incrementalism. We fund the work that will define what comes next.</p>
+      </div>
+    </div>
+    <div class="reveal d2">
+      <div class="mission-quote">
+        <blockquote>"The purpose of the Foundation is to accelerate the transition to sustainable energy, advance science education, and ensure AI remains safe and beneficial to all of humanity."</blockquote>
+        <cite>&mdash; Foundation Charter, 2001</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section id="values" class="sec" style="background:var(--navy2)">
+  <div class="reveal" style="max-width:560px">
+    <div class="sec-label">What We Believe</div>
+    <h2 class="sec-title">Our <em>Principles</em></h2>
+    <div class="divider"></div>
+  </div>
+  <div class="values-grid">
+    <div class="val-box reveal"><div class="val-num">01</div><span class="val-icon">&#9889;</span><div class="val-title">Civilizational Thinking</div><p class="val-desc">We fund work with 50-year horizons, not quarterly cycles. The greatest problems demand patience that most institutions cannot sustain.</p></div>
+    <div class="val-box reveal d1"><div class="val-num">02</div><span class="val-icon">&#128640;</span><div class="val-title">Radical Ambition</div><p class="val-desc">Incremental work finds other funders. We back the transformative — the research that has a 20% chance of being world-changing.</p></div>
+    <div class="val-box reveal d2"><div class="val-num">03</div><span class="val-icon">&#128270;</span><div class="val-title">Open Science</div><p class="val-desc">Knowledge advances fastest when findings are shared freely. All Foundation-funded research must be published openly. No exceptions.</p></div>
+    <div class="val-box reveal d1"><div class="val-num">04</div><span class="val-icon">&#9878;</span><div class="val-title">Rigorous Accountability</div><p class="val-desc">Every grant is milestone-tied, every dollar tracked, every outcome reported. Trust is earned through discipline, not declarations.</p></div>
+    <div class="val-box reveal d2"><div class="val-num">05</div><span class="val-icon">&#127758;</span><div class="val-title">Global Equity</div><p class="val-desc">Brilliant researchers exist everywhere. Over 40% of our grants fund work outside the United States.</p></div>
+    <div class="val-box reveal d3"><div class="val-num">06</div><span class="val-icon">&#129504;</span><div class="val-title">Honest Uncertainty</div><p class="val-desc">We fund portfolios of bold bets, learn from failures, and compound on successes. Intellectual honesty is a prerequisite.</p></div>
+  </div>
+</section>
+
+<!-- HISTORY TIMELINE -->
+<section id="history" class="sec">
+  <div class="reveal" style="max-width:560px">
+    <div class="sec-label">Our Journey</div>
+    <h2 class="sec-title">Two Decades of<br><em>Impact</em></h2>
+    <div class="divider"></div>
+  </div>
+  <div class="timeline">
+    <div class="tl-item reveal"><div class="tl-dot"></div><div class="tl-year">2001 &mdash; Foundation</div><div class="tl-title">The Musk Foundation is Established</div><p class="tl-body">Founded with an initial endowment focused on renewable energy and science education. First grant cycle: 12 awards totaling $3.2 million.</p></div>
+    <div class="tl-item reveal"><div class="tl-dot"></div><div class="tl-year">2005 &mdash; Expansion</div><div class="tl-title">Safe AI Added as a Core Focus Area</div><p class="tl-body">The Foundation formally adds AI safety and alignment research to its grant portfolio — nearly a decade before this became mainstream philanthropic interest.</p></div>
+    <div class="tl-item reveal"><div class="tl-dot"></div><div class="tl-year">2009 &mdash; Global Reach</div><div class="tl-title">First International Grant Class</div><p class="tl-body">The Foundation expands beyond the United States, funding projects in 14 countries across Africa, Asia, and South America.</p></div>
+    <div class="tl-item reveal"><div class="tl-dot"></div><div class="tl-year">2014 &mdash; Milestone</div><div class="tl-title">$50 Million Awarded Cumulatively</div><p class="tl-body">Over 300 projects funded. Notable outcomes include a perovskite solar cell efficiency breakthrough at MIT and an open-source STEM curriculum now used in 22 countries.</p></div>
+    <div class="tl-item reveal"><div class="tl-dot"></div><div class="tl-year">2018 &mdash; Refinement</div><div class="tl-title">Milestone-Based Disbursement Introduced</div><p class="tl-body">The Foundation restructures all grants to use milestone-tied disbursement, improving accountability and grantee renewal rates significantly.</p></div>
+    <div class="tl-item reveal"><div class="tl-dot"></div><div class="tl-year">2022 &mdash; Scale</div><div class="tl-title">Largest Single Grant in Foundation History</div><p class="tl-body">A $10 million, three-year grant awarded to a university consortium for grid-scale long-duration battery storage research.</p></div>
+    <div class="tl-item reveal"><div class="tl-dot"></div><div class="tl-year">2025 &mdash; Today</div><div class="tl-title">$100M+ Awarded Across 600+ Projects</div><p class="tl-body">The Foundation enters its third decade with its largest annual grant budget, active programs in 40+ countries.</p></div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="sec" style="background:var(--navy2)">
+  <div class="reveal">
+    <div class="sec-label">Leadership</div>
+    <h2 class="sec-title">The <em>People</em> Behind<br>the Work</h2>
+    <div class="divider"></div>
+  </div>
+  <div class="team-intro reveal">
+    <p>The Musk Foundation is intentionally lean. Our program staff are deep subject-matter experts who evaluate grants, support grantees, and ensure resources flow to the highest-impact work.</p>
+  </div>
+  <div class="team-grid">
+    <div class="tm-card reveal"><div class="tm-avatar">E</div><div class="tm-name">Elon Musk</div><div class="tm-title">Founder &amp; Chair</div><p class="tm-bio">Entrepreneur, engineer, and philanthropist. Founded the Musk Foundation in 2001 with a conviction that private capital can unlock progress traditional institutions cannot.</p></div>
+    <div class="tm-card reveal d1"><div class="tm-avatar">S</div><div class="tm-name">Sarah Chen</div><div class="tm-title">Executive Director</div><p class="tm-bio">Former faculty at Stanford's Energy Systems Lab. 15 years in philanthropic leadership across science and climate. Joined the Foundation in 2017.</p></div>
+    <div class="tm-card reveal d2"><div class="tm-avatar">M</div><div class="tm-name">Marcus Obi</div><div class="tm-title">Director, Science Grants</div><p class="tm-bio">PhD in Materials Science from Caltech. Oversees the renewable energy and space exploration portfolios. 30+ peer-reviewed publications.</p></div>
+    <div class="tm-card reveal d3"><div class="tm-avatar">A</div><div class="tm-name">Anika Patel</div><div class="tm-title">Director, AI &amp; Education</div><p class="tm-bio">Former AI safety researcher at OpenAI. Leads the Foundation's safe AI grant portfolio and global education programs. Fluent in five languages.</p></div>
+  </div>
+</section>
+
+<!-- TRANSPARENCY -->
+<section id="transparency" class="sec">
+  <div class="trans-grid">
+    <div class="reveal">
+      <div class="sec-label">Governance &amp; Transparency</div>
+      <h2 class="sec-title">Open Books,<br><em>Clear</em> Purpose</h2>
+      <div class="divider"></div>
+      <div class="trans-text">
+        <p>We believe philanthropic institutions owe the public full transparency about how resources are deployed. The Musk Foundation publishes its Form 990, annual grant reports, and conflict-of-interest disclosures without exception.</p>
+        <p>Our board includes independent members with no financial relationship to Foundation grantees. All grant decisions are reviewed by at least two independent program officers.</p>
+      </div>
+      <div class="doc-list">
+        <div class="doc-item"><div class="doc-info"><span class="doc-icon">&#128196;</span><div><span class="doc-name">Form 990 &mdash; 2024</span><span class="doc-meta">IRS Public Filing &middot; Annual</span></div></div><a href="#" class="doc-link">View PDF</a></div>
+        <div class="doc-item"><div class="doc-info"><span class="doc-icon">&#128202;</span><div><span class="doc-name">Annual Report &mdash; 2024</span><span class="doc-meta">Grant Summary &middot; Impact Data</span></div></div><a href="#" class="doc-link">View PDF</a></div>
+        <div class="doc-item"><div class="doc-info"><span class="doc-icon">&#9878;</span><div><span class="doc-name">Conflict of Interest Policy</span><span class="doc-meta">Governance Document &middot; 2023</span></div></div><a href="#" class="doc-link">View PDF</a></div>
+        <div class="doc-item"><div class="doc-info"><span class="doc-icon">&#128221;</span><div><span class="doc-name">Grantmaking Policy</span><span class="doc-meta">Process &amp; Criteria &middot; 2024</span></div></div><a href="#" class="doc-link">View PDF</a></div>
+      </div>
+    </div>
+    <div class="reveal d2">
+      <div class="ratings-box">
+        <h3>Independent Ratings</h3>
+        <p>The Musk Foundation maintains the highest ratings in transparency, accountability, and financial stewardship.</p>
+        <div class="rating-row"><span class="rating-org">Charity Navigator</span><div class="rating-stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div><span class="rating-badge">4 Stars</span></div>
+        <div class="rating-row"><span class="rating-org">GuideStar</span><div class="rating-stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div><span class="rating-badge">Platinum Seal</span></div>
+        <div class="rating-row"><span class="rating-org">BBB Wise Giving</span><div class="rating-stars"><span class="star">&#10003;</span></div><span class="rating-badge">Accredited</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="sec" style="background:var(--navy2);border-top:1px solid var(--border)">
+  <div class="cta-inner reveal" style="text-align:center">
+    <div class="sec-label" style="justify-content:center">Work With Us</div>
+    <h2 class="sec-title" style="text-align:center">Ready to<br><em>Apply?</em></h2>
+    <div class="divider" style="margin:28px auto"></div>
+    <p>If your research aligns with our focus areas and you believe you're ready to make a credible case for transformative impact, we want to hear from you.</p>
+    <div class="cta-btns">
+      <a href="#" class="btn-gold" onclick="openModal();return false;">Submit Letter of Inquiry</a>
+      <a href="#" class="btn-outline" onclick="showPage('home');setTimeout(()=>document.getElementById('areas').scrollIntoView({behavior:'smooth'}),50);return false;">Explore Focus Areas</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (about) -->
+<footer>
+  <div class="foot-top">
+    <div>
+      <span class="foot-brand-em">Musk Foundation</span>
+      <span class="foot-brand-cap">Advancing Human Civilization</span>
+      <p class="foot-about">Providing grants for renewable energy research, science &amp; engineering education, pediatric health, safe AI, and conservation since 2001.</p>
+      <div class="foot-social">
+        <a href="#" class="soc">&#120143;</a>
+        <a href="#" class="soc">in</a>
+        <a href="#" class="soc">&#8853;</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <h4>Foundation</h4>
+      <ul>
+        <li><a href="#" onclick="showPage('about');return false;">About Us</a></li>
+        <li><a href="#mission">Mission &amp; Values</a></li>
+        <li><a href="#team">Our Team</a></li>
+        <li><a href="#transparency">Annual Reports</a></li>
+        <li><a href="#" onclick="showPage('contact');return false;">Contact</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>Grants</h4>
+      <ul>
+        <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('areas').scrollIntoView({behavior:'smooth'}),50);return false;">Focus Areas</a></li>
+        <li><a href="#" onclick="openModal();return false;">Apply Now</a></li>
+        <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('grantees').scrollIntoView({behavior:'smooth'}),50);return false;">Current Grantees</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('news').scrollIntoView({behavior:'smooth'}),50);return false;">News &amp; Updates</a></li>
+        <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('faq').scrollIntoView({behavior:'smooth'}),50);return false;">FAQ</a></li>
+        <li><a href="#" onclick="showPage('contact');return false;">Get In Touch</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <div class="foot-copy">&copy; 2025 Musk Foundation. All Rights Reserved.</div>
+    <div class="foot-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Accessibility</a>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /page-about -->
+
+
+<!-- ================================================================
+     CONTACT PAGE
+     ================================================================ -->
+<div class="page" id="page-contact">
+
+<section class="page-hero">
+  <div class="hero-eyebrow">Musk Foundation &mdash; Get In Touch</div>
+  <h1 class="hero-h1">We'd Love to<br><em>Hear</em> from You</h1>
+  <p class="hero-sub">Questions about grants, partnerships, or the Foundation's work — we respond to every inquiry.</p>
+</section>
+
+<!-- MAIN CONTACT -->
+<section id="contact-main" class="sec">
+  <div class="contact-grid">
+
+    <!-- LEFT: Info -->
+    <div class="reveal">
+      <div class="sec-label">Contact Information</div>
+      <h2 class="sec-title">Reach <em>Us</em><br>Directly</h2>
+      <div class="divider"></div>
+      <p style="font-size:.97rem;line-height:1.85;color:var(--text-muted)">Our program staff respond to all inquiries personally. We do not use automated email filters for grant-related questions. Expect a thoughtful reply, not a form letter.</p>
+
+      <div class="channel-list">
+        <div class="channel">
+          <span class="ch-icon">&#9993;</span>
+          <div class="ch-body">
+            <div class="ch-label">Primary Email</div>
+            <div class="ch-value"><a href="/cdn-cgi/l/email-protection#e18693808f9592a18c94928a878e948f858095888e8fcf8e9386"><span class="__cf_email__" data-cfemail="baddc8dbd4cec9fad7cfc9d1dcd5cfd4dedbced3d5d494d5c8dd">[email&#160;protected]</span></a></div>
+            <div class="ch-note">For all general inquiries, partnerships, press, and grant questions.</div>
+          </div>
+        </div>
+        <div class="channel">
+          <span class="ch-icon">&#128196;</span>
+          <div class="ch-body">
+            <div class="ch-label">Grant Applications</div>
+            <div class="ch-value"><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('apply').scrollIntoView({behavior:'smooth'}),50);return false;">Submit via Online Portal</a></div>
+            <div class="ch-note">All Letters of Inquiry must be submitted through our official application system.</div>
+          </div>
+        </div>
+        <div class="channel">
+          <span class="ch-icon">&#128205;</span>
+          <div class="ch-body">
+            <div class="ch-label">Mailing Address</div>
+            <div class="ch-value">Musk Foundation</div>
+            <div class="ch-note">1 Rocket Road, Hawthorne, CA 90250, United States</div>
+          </div>
+        </div>
+        <div class="channel">
+          <span class="ch-icon">&#128337;</span>
+          <div class="ch-body">
+            <div class="ch-label">Office Hours</div>
+            <div class="ch-value">Mon &ndash; Fri, 9am &ndash; 6pm PT</div>
+            <div class="ch-note">We observe all U.S. federal holidays. International inquiries welcome any time.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="response-box">
+        <h4>Expected Response Times</h4>
+        <div class="rt-row"><span class="rt-type">General inquiries</span><span class="rt-time">2&ndash;3 business days</span></div>
+        <div class="rt-row"><span class="rt-type">Grant inquiries</span><span class="rt-time">5 business days</span></div>
+        <div class="rt-row"><span class="rt-type">Press &amp; media</span><span class="rt-time">1&ndash;2 business days</span></div>
+        <div class="rt-row"><span class="rt-type">Partnership proposals</span><span class="rt-time">5&ndash;7 business days</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Form -->
+    <div class="reveal d2">
+      <div class="form-card">
+        <div class="form-head">
+          <h3>Send a Message</h3>
+          <p>We read every submission &middot; Responses within 2&ndash;5 days</p>
+        </div>
+        <div class="form-body" id="formBody">
+          <div class="f-row-2">
+            <div class="f-grp-c"><label>First Name *</label><input type="text" id="fname" placeholder="Jane"></div>
+            <div class="f-grp-c"><label>Last Name *</label><input type="text" id="lname" placeholder="Smith"></div>
+          </div>
+          <div class="f-grp-c"><label>Email Address *</label><input type="email" id="cemail" placeholder="jane@university.edu"></div>
+          <div class="f-grp-c"><label>Organization</label><input type="text" id="corg" placeholder="Institution or company (optional)"></div>
+          <div class="f-grp-c">
+            <label>Subject *</label>
+            <select id="csubject">
+              <option value="">Select a topic</option>
+              <option>Grant Application Question</option>
+              <option>Eligibility Inquiry</option>
+              <option>Partnership Proposal</option>
+              <option>Media &amp; Press</option>
+              <option>General Inquiry</option>
+              <option>Technical Issue</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="f-grp-c"><label>Message *</label><textarea id="cmessage" rows="6" placeholder="Tell us how we can help. Please be as specific as possible about your inquiry."></textarea></div>
+          <button class="submit-btn" onclick="submitContact()">Send Message &nbsp;&#8594;</button>
+          <p class="form-note">&#128274; &nbsp; Your information is never shared or sold</p>
+        </div>
+        <div class="form-success" id="formSuccess">
+          <div class="success-icon">&#10022;</div>
+          <h3>Message Received</h3>
+          <p>Thank you for reaching out to the Musk Foundation. A member of our team will respond to <span id="confirmedEmail" style="color:var(--gold)"></span> within 2&ndash;5 business days.</p>
+          <br>
+          <p style="font-size:.82rem">In the meantime, you may find answers to common questions in our <a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('faq').scrollIntoView({behavior:'smooth'}),50);return false;" style="color:var(--gold)">FAQ section</a>.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- DEPARTMENTS -->
+<section id="departments" class="sec" style="background:var(--navy2)">
+  <div class="reveal">
+    <div class="sec-label">Specialized Inquiries</div>
+    <h2 class="sec-title">Contact the Right<br><em>Team</em></h2>
+    <div class="divider"></div>
+  </div>
+  <div class="dept-grid">
+    <div class="dept-box reveal">
+      <span class="dept-icon">&#128300;</span>
+      <div class="dept-name">Grant Programs</div>
+      <p class="dept-desc">Questions about eligibility, focus areas, deadlines, the LOI process, or ongoing grant agreements.</p>
+      <a href="/cdn-cgi/l/email-protection#82e5f0e3ecf6f1c2eff7f1e9e4edf7ece6e3f6ebedecacedf0e5" class="dept-email"><span class="__cf_email__" data-cfemail="325540535c4641725f474159545d475c5653465b5d5c1c5d4055">[email&#160;protected]</span></a>
+    </div>
+    <div class="dept-box reveal d1">
+      <span class="dept-icon">&#128240;</span>
+      <div class="dept-name">Press &amp; Media</div>
+      <p class="dept-desc">Journalists and media professionals seeking information, interviews, or Foundation statements.</p>
+      <a href="/cdn-cgi/l/email-protection#5b3c293a352f281b362e28303d342e353f3a2f3234357534293c" class="dept-email"><span class="__cf_email__" data-cfemail="7c1b0e1d12080f3c11090f171a130912181d0815131252130e1b">[email&#160;protected]</span></a>
+    </div>
+    <div class="dept-box reveal d2">
+      <span class="dept-icon">&#129309;</span>
+      <div class="dept-name">Partnerships</div>
+      <p class="dept-desc">Organizations interested in co-funding, strategic alliances, or joint program development.</p>
+      <a href="/cdn-cgi/l/email-protection#ec8b9e8d82989fac81999f878a839982888d98858382c2839e8b" class="dept-email"><span class="__cf_email__" data-cfemail="cfa8bdaea1bbbc8fa2babca4a9a0baa1abaebba6a0a1e1a0bda8">[email&#160;protected]</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section id="location" class="sec">
+  <div class="loc-grid">
+    <div class="reveal">
+      <div class="sec-label">Our Location</div>
+      <h2 class="sec-title">Where to<br><em>Find</em> Us</h2>
+      <div class="divider"></div>
+      <p style="font-size:.97rem;line-height:1.85;color:var(--text-muted);margin-bottom:36px">The Foundation is headquartered in Southern California, with program staff operating across North America, Europe, and sub-Saharan Africa.</p>
+      <div>
+        <div class="loc-detail">
+          <span class="loc-icon">&#127968;</span>
+          <div class="loc-info">
+            <strong>Headquarters</strong>
+            <span>1 Rocket Road<br>Hawthorne, CA 90250<br>United States</span>
+          </div>
+        </div>
+        <div class="loc-detail">
+          <span class="loc-icon">&#9993;</span>
+          <div class="loc-info">
+            <strong>Email</strong>
+            <span><a href="/cdn-cgi/l/email-protection#553227343b2126153820263e333a203b3134213c3a3b7b3a2732" style="color:var(--gold);text-decoration:none"><span class="__cf_email__" data-cfemail="016673606f7572416c74726a676e746f656075686e6f2f6e7366">[email&#160;protected]</span></a></span>
+          </div>
+        </div>
+        <div class="loc-detail">
+          <span class="loc-icon">&#127758;</span>
+          <div class="loc-info">
+            <strong>Regional Offices</strong>
+            <span>London, UK &middot; Nairobi, Kenya &middot; Singapore</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal d2">
+      <div class="map-placeholder">
+        <div class="map-grid-lines"></div>
+        <div class="map-pin">
+          <div class="map-pin-dot"></div>
+          <div class="map-pin-label">Musk Foundation HQ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (contact) -->
+<footer>
+  <div class="foot-top">
+    <div>
+      <span class="foot-brand-em">Musk Foundation</span>
+      <span class="foot-brand-cap">Advancing Human Civilization</span>
+      <p class="foot-about">Providing grants for renewable energy research, science &amp; engineering education, pediatric health, safe AI, and conservation since 2001.</p>
+      <div class="foot-social">
+        <a href="#" class="soc">&#120143;</a>
+        <a href="#" class="soc">in</a>
+        <a href="#" class="soc">&#8853;</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <h4>Foundation</h4>
+      <ul>
+        <li><a href="#" onclick="showPage('about');return false;">About Us</a></li>
+        <li><a href="#" onclick="showPage('about');return false;">Mission &amp; Values</a></li>
+        <li><a href="#" onclick="showPage('about');return false;">Our Team</a></li>
+        <li><a href="#" onclick="showPage('contact');return false;">Contact</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>Grants</h4>
+      <ul>
+        <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('areas').scrollIntoView({behavior:'smooth'}),50);return false;">Focus Areas</a></li>
+        <li><a href="#" onclick="openModal();return false;">Apply Now</a></li>
+        <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('grantees').scrollIntoView({behavior:'smooth'}),50);return false;">Current Grantees</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('news').scrollIntoView({behavior:'smooth'}),50);return false;">News &amp; Updates</a></li>
+        <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('faq').scrollIntoView({behavior:'smooth'}),50);return false;">FAQ</a></li>
+        <li><a href="#" onclick="showPage('contact');return false;">Get In Touch</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <div class="foot-copy">&copy; 2025 Musk Foundation. All Rights Reserved.</div>
+    <div class="foot-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Accessibility</a>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /page-contact -->
+
+
+<!-- APPLY MODAL (shared) -->
+<div id="app-modal">
+  <div class="app-overlay" onclick="closeModal()"></div>
+  <div class="app-box">
+    <div class="app-head">
+      <div><div class="app-title">Letter of <span>Inquiry</span></div><div style="font-size:.72rem;color:var(--text-muted);margin-top:5px;font-family:'JetBrains Mono',monospace;letter-spacing:1px">First step to applying for a Musk Foundation grant</div></div>
+      <button class="app-close" onclick="closeModal()">&#10005;</button>
+    </div>
+    <div class="app-body">
+      <div class="app-tabs">
+        <div class="app-tab active" id="atab1">01 &middot; Organization</div>
+        <div class="app-tab" id="atab2">02 &middot; Project</div>
+        <div class="app-tab" id="atab3">03 &middot; Budget</div>
+        <div class="app-tab" id="atab4">04 &middot; Submit</div>
+      </div>
+      <!-- Step 1 -->
+      <div class="f-sec active" id="asec1">
+        <div class="f-row">
+          <div class="f-grp"><label>Organization Name *</label><input type="text" placeholder="e.g. University Research Lab"></div>
+          <div class="f-grp"><label>Organization Type *</label><select><option value="">Select type</option><option>501(c)(3) Nonprofit</option><option>University / Academic Institution</option><option>Research Institute</option><option>Government Agency</option><option>International NGO</option><option>Individual Researcher</option></select></div>
+        </div>
+        <div class="f-row">
+          <div class="f-grp"><label>Principal Investigator *</label><input type="text" placeholder="Full name"></div>
+          <div class="f-grp"><label>Title / Role</label><input type="text" placeholder="e.g. Professor of Physics"></div>
+        </div>
+        <div class="f-row">
+          <div class="f-grp"><label>Contact Email *</label><input type="email" placeholder="you@organization.org"></div>
+          <div class="f-grp"><label>Phone Number</label><input type="tel" placeholder="+1 (555) 000-0000"></div>
+        </div>
+        <div class="f-grp"><label>Country / Primary Location *</label><input type="text" placeholder="e.g. United States"></div>
+        <div class="f-nav"><span class="f-prog">Step 1 of 4</span><button class="b-sm b-sm-g" onclick="nextSec(1)">Next: Project Details &#8594;</button></div>
+      </div>
+      <!-- Step 2 -->
+      <div class="f-sec" id="asec2">
+        <div class="f-grp"><label>Project Title *</label><input type="text" placeholder="A clear, descriptive title for your project"></div>
+        <div class="f-row">
+          <div class="f-grp"><label>Primary Focus Area *</label><select><option value="">Select area</option><option>Renewable Energy</option><option>Science &amp; Engineering Education</option><option>Safe Artificial Intelligence</option><option>Pediatric Health</option><option>Space &amp; Exploration</option><option>Environment &amp; Conservation</option></select></div>
+          <div class="f-grp"><label>Proposed Duration *</label><select><option value="">Select duration</option><option>6 months</option><option>12 months</option><option>18 months</option><option>24 months</option><option>36 months</option></select></div>
+        </div>
+        <div class="f-grp"><label>Project Summary * (max 300 words)</label><textarea rows="5" placeholder="Describe your project. What problem does it address? What will you do? What will change?"></textarea></div>
+        <div class="f-grp"><label>Why This Work Matters</label><textarea rows="4" placeholder="What is at stake? Why is this project important beyond your field?"></textarea></div>
+        <div class="f-grp"><label>Previous Relevant Work</label><textarea rows="3" placeholder="Briefly describe your team's track record in this area."></textarea></div>
+        <div class="f-nav"><button class="b-sm b-sm-o" onclick="prevSec(2)">&#8592; Back</button><span class="f-prog">Step 2 of 4</span><button class="b-sm b-sm-g" onclick="nextSec(2)">Next: Budget &#8594;</button></div>
+      </div>
+      <!-- Step 3 -->
+      <div class="f-sec" id="asec3">
+        <div class="f-row">
+          <div class="f-grp"><label>Total Grant Request (USD) *</label><select><option value="">Select amount</option><option value="5000000">$5,000,000</option><option value="10000000">$10,000,000</option><option value="15000000">$15,000,000</option><option value="20000000">$20,000,000</option></select></div>
+          <div class="f-grp"><label>Indirect Cost Rate</label><input type="text" placeholder="e.g. 20% (max 25%)"></div>
+        </div>
+        <div class="f-grp"><label>Budget Overview *</label><textarea rows="4" placeholder="Summarize major budget categories: personnel, equipment, supplies, travel, indirect costs."></textarea></div>
+        <div class="f-grp"><label>Other Funding Sources</label><textarea rows="3" placeholder="List any confirmed or pending funding from other sources."></textarea></div>
+        <div class="f-grp"><label>Expected Outcomes &amp; Impact *</label><textarea rows="4" placeholder="What will success look like? List 2-3 specific, measurable outcomes."></textarea></div>
+        <div class="f-grp"><label>How did you hear about us?</label><select><option value="">Select one</option><option>Colleague or peer referral</option><option>Foundation website</option><option>Social media</option><option>Conference or event</option><option>News article</option><option>Previous grantee</option></select></div>
+        <div class="f-nav"><button class="b-sm b-sm-o" onclick="prevSec(3)">&#8592; Back</button><span class="f-prog">Step 3 of 4</span><button class="b-sm b-sm-g" onclick="nextSec(3)">Review &amp; Submit &#8594;</button></div>
+      </div>
+      <!-- Step 4 -->
+      <div class="f-sec" id="asec4">
+        <div style="background:rgba(201,168,76,0.06);border:1px solid var(--border);padding:26px;margin-bottom:26px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px">Before You Submit</div>
+          <div class="elig-item"><span class="elig-icon">&#10003;</span>I confirm this organization qualifies as a 501(c)(3) or equivalent</div>
+          <div class="elig-item"><span class="elig-icon">&#10003;</span>The project aligns with at least one Musk Foundation focus area</div>
+          <div class="elig-item"><span class="elig-icon">&#10003;</span>All information provided is accurate and complete</div>
+          <div class="elig-item"><span class="elig-icon">&#10003;</span>I understand this is a Letter of Inquiry, not a final application</div>
+        </div>
+        <div class="f-grp"><label>Certify and Sign *</label><input type="text" placeholder="Type your full name to certify this submission"></div>
+        <div class="f-grp"><label>Date</label><input type="text" id="modalDate" readonly style="color:var(--text-muted)"></div>
+        <div class="f-grp"><label>Additional Notes</label><textarea rows="3" placeholder="Anything else you'd like us to know?"></textarea></div>
+        <div class="f-nav"><button class="b-sm b-sm-o" onclick="prevSec(4)">&#8592; Back</button><span class="f-prog">Step 4 of 4</span><button class="b-sm b-sm-g" onclick="submitApp()">Submit Letter of Inquiry</button></div>
+      </div>
+      <!-- Success -->
+      <div class="success-sc" id="appSuccess">
+        <div style="font-size:3rem;margin-bottom:20px">&#10022;</div>
+        <h3>Letter of Inquiry Submitted</h3>
+        <p>Thank you. Our program team will review your letter within 6-8 weeks and respond to the email provided.</p>
+        <br>
+        <button class="b-sm b-sm-g" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BACK TO TOP -->
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">&#8593;</button>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* PAGE ROUTER */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo(0,0);
+  document.querySelectorAll('.nav-links a').forEach(function(a){a.classList.remove('active')});
+  if(name==='about')document.getElementById('nav-about').classList.add('active');
+  if(name==='contact')document.getElementById('nav-contact').classList.add('active');
+  setTimeout(function(){
+    document.querySelectorAll('#page-'+name+' .reveal').forEach(function(el){el.classList.remove('in');revObs.observe(el)});
+  },50);
+}
+
+/* STARFIELD */
+(function(){
+  var c=document.getElementById('starfield'),ctx=c.getContext('2d'),W,H,stars=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  function init(){stars=[];for(var i=0;i<160;i++)stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.2,a:Math.random(),da:(.001+Math.random()*.003)*(Math.random()<.5?1:-1),vx:(Math.random()-.5)*.07,vy:(Math.random()-.5)*.07})}
+  function draw(){ctx.clearRect(0,0,W,H);stars.forEach(function(s){s.x+=s.vx;s.y+=s.vy;s.a+=s.da;if(s.a<0||s.a>1)s.da*=-1;if(s.x<0)s.x=W;if(s.x>W)s.x=0;if(s.y<0)s.y=H;if(s.y>H)s.y=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='rgba(201,168,76,'+s.a*.45+')';ctx.fill()});requestAnimationFrame(draw)}
+  window.addEventListener('resize',function(){resize();init()});resize();init();draw();
+})();
+
+/* CURSOR */
+var cur=document.getElementById('cur'),ring=document.getElementById('curRing'),mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function anim(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(anim)})();
+document.querySelectorAll('a,button,.gc,.n-card,.s-box,.val-box,.tm-card,.doc-item,.dept-box,.channel').forEach(function(el){
+  el.addEventListener('mouseenter',function(){cur.classList.add('grow');ring.classList.add('grow')});
+  el.addEventListener('mouseleave',function(){cur.classList.remove('grow');ring.classList.remove('grow')});
+});
+
+/* NAVBAR */
+window.addEventListener('scroll',function(){
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
+  document.getElementById('btt').classList.toggle('show',window.scrollY>400);
+});
+
+/* MOBILE MENU */
+function toggleMob(){document.getElementById('mob-menu').classList.toggle('open')}
+
+/* REVEAL */
+var revObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in')})},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(r){revObs.observe(r)});
+
+/* COUNTERS */
+function animCounter(el){
+  var target=+el.dataset.target,prefix=el.dataset.prefix||'',suffix=el.dataset.suffix||'',start=null,dur=2000;
+  (function step(ts){if(!start)start=ts;var p=Math.min((ts-start)/dur,1),ease=1-Math.pow(1-p,3),val=Math.floor(ease*target);el.textContent=prefix+val+suffix;if(p<1)requestAnimationFrame(step);else el.textContent=prefix+target+suffix;})(performance.now());
+}
+var cObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){animCounter(e.target);cObs.unobserve(e.target)}})},{threshold:.5});
+document.querySelectorAll('.s-num[data-target]').forEach(function(el){cObs.observe(el)});
+
+/* FAQ */
+function toggleFaq(btn){
+  var item=btn.closest('.faq-item'),wasOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(function(i){i.classList.remove('open')});
+  document.querySelectorAll('.faq-tog').forEach(function(t){t.textContent='+'});
+  if(!wasOpen){item.classList.add('open');btn.querySelector('.faq-tog').textContent='\u2212'}
+}
+
+/* AREA TABS */
+function switchArea(id,btn){
+  document.querySelectorAll('.area-pane').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.a-tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('area-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* GRANTEES FILTER */
+function filterG(cat,btn){
+  document.querySelectorAll('.f-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  document.querySelectorAll('.gc').forEach(function(c){c.style.display=(cat==='all'||c.dataset.cat===cat)?'block':'none'});
+}
+
+/* TESTIMONIALS */
+var curT=0,totalT=4;
+
+/* CRISIS TESTIMONIALS SLIDER */
+var curCT=0,totalCT=5;
+function goCT(n){
+  curCT=n;
+  document.getElementById('ctTrack').style.transform='translateX(-'+(n*100)+'%)';
+  document.querySelectorAll('.ct-dot').forEach(function(d,i){
+    if(i===n){d.style.width='26px';d.style.borderRadius='4px';d.style.background='var(--gold)';}
+    else{d.style.width='8px';d.style.borderRadius='50%';d.style.background='var(--text-muted)';}
+  });
+}
+function nextCT(){goCT((curCT+1)%totalCT);}
+function prevCT(){goCT((curCT-1+totalCT)%totalCT);}
+var autoCT=setInterval(nextCT,6000);
+var ctSlider=document.querySelector('.ct-slider');
+if(ctSlider){ctSlider.addEventListener('mouseenter',function(){clearInterval(autoCT)});ctSlider.addEventListener('mouseleave',function(){autoCT=setInterval(nextCT,6000)});}
+function goT(n){curT=n;document.getElementById('tTrack').style.transform='translateX(-'+(n*100)+'%)';document.querySelectorAll('.t-dot-btn').forEach(function(d,i){d.classList.toggle('active',i===n)});}
+function nextT(){goT((curT+1)%totalT)}
+function prevT(){goT((curT-1+totalT)%totalT)}
+var autoT=setInterval(nextT,6000);
+var tSlider=document.querySelector('.t-slider');
+if(tSlider){tSlider.addEventListener('mouseenter',function(){clearInterval(autoT)});tSlider.addEventListener('mouseleave',function(){autoT=setInterval(nextT,6000)});}
+
+/* NEWSLETTER */
+function doSubscribe(){
+  var email=document.getElementById('nlEmail').value,msg=document.getElementById('nlMsg');
+  if(!email||!email.includes('@')){msg.textContent='Please enter a valid email.';msg.style.color='#ff6b6b';return}
+  msg.textContent='\u2713 You\'re subscribed!';msg.style.color='var(--gold)';
+  document.getElementById('nlEmail').value='';
+}
+
+/* ── WEB3FORMS ── */
+var W3F_KEY='e238a597-261c-4262-a2b2-b78e1740dd73'; /* access key for elonmuskorganization101@gmail.com */
+
+function w3fSend(payload, onSuccess, onError){
+  payload.access_key = W3F_KEY;
+  fetch('https://api.web3forms.com/submit',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify(payload)
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){if(d.success){onSuccess();}else{onError(d.message||'Submission failed.');}})
+  .catch(function(e){onError('Network error. Please try again.');});
+}
+
+/* APPLY MODAL */
+var curSec=1;
+function openModal(){document.getElementById('app-modal').classList.add('open');document.body.style.overflow='hidden';document.getElementById('modalDate').value=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});}
+function closeModal(){document.getElementById('app-modal').classList.remove('open');document.body.style.overflow='';}
+function nextSec(from){document.getElementById('asec'+from).classList.remove('active');document.getElementById('atab'+from).classList.remove('active');document.getElementById('atab'+from).classList.add('done');curSec=from+1;document.getElementById('asec'+curSec).classList.add('active');document.getElementById('atab'+curSec).classList.add('active');document.querySelector('.app-box').scrollTop=0;}
+function prevSec(from){document.getElementById('asec'+from).classList.remove('active');document.getElementById('atab'+from).classList.remove('active');curSec=from-1;document.getElementById('asec'+curSec).classList.add('active');document.getElementById('atab'+curSec).classList.add('active');document.querySelector('.app-box').scrollTop=0;}
+function submitApp(){
+  function val(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+  var payload={
+    subject:'Grant Application — '+(val('orgName')||'Applicant'),
+    from_name:'Musk Foundation Application Portal',
+    'Organization':val('orgName'),
+    'Contact Name':val('contactName'),
+    'Email':val('appEmail'),
+    'Phone':val('appPhone'),
+    'Country':val('orgCountry'),
+    'Project Title':val('projTitle'),
+    'Focus Area':val('focusArea'),
+    'Grant Amount Requested':val('grantAmount'),
+    'Project Duration':val('projDuration'),
+    'Project Description':val('projDesc'),
+    'Impact & Outcomes':val('projImpact'),
+    'Budget Overview':val('budgetDesc'),
+    'Additional Notes':val('appNotes'),
+    'Submitted':new Date().toLocaleString()
+  };
+  w3fSend(payload, function(){
+    for(var i=1;i<=4;i++){document.getElementById('asec'+i).classList.remove('active');document.getElementById('atab'+i).classList.remove('active');}
+    document.getElementById('appSuccess').classList.add('show');
+    document.querySelector('.app-tabs').style.display='none';
+  }, function(msg){alert('Error: '+msg);});
+}
+
+/* CONTACT PAGE FORM */
+function submitContact(){
+  var fname=document.getElementById('fname').value.trim(),
+      lname=document.getElementById('lname').value.trim(),
+      email=document.getElementById('cemail').value.trim(),
+      org=document.getElementById('corg')?document.getElementById('corg').value.trim():'',
+      subject=document.getElementById('csubject').value,
+      message=document.getElementById('cmessage').value.trim();
+  if(!fname||!lname||!email||!subject||!message){alert('Please fill in all required fields.');return;}
+  if(!email.includes('@')){alert('Please enter a valid email address.');return;}
+  var payload={
+    subject:'Contact Form: '+subject+' — '+fname+' '+lname,
+    from_name:fname+' '+lname,
+    name:fname+' '+lname,
+    email:email,
+    'Organization':org||'N/A',
+    'Subject':subject,
+    message:message,
+    'Submitted':new Date().toLocaleString()
+  };
+  w3fSend(payload, function(){
+    var confirmedEl=document.getElementById('confirmedEmail');
+    if(confirmedEl)confirmedEl.textContent=email;
+    var formBody=document.getElementById('formBody');
+    var formSuccess=document.getElementById('formSuccess');
+    if(formBody)formBody.style.display='none';
+    if(formSuccess)formSuccess.style.display='block';
+    document.getElementById('contactSuccess').classList.add('show');
+  }, function(msg){alert('Error: '+msg);});
+}
+
+/* FOOTER MESSAGE FORM */
+function submitFmsg(){
+  function fval(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+  var payload={
+    subject:'Foundation Message — '+(fval('fmsg-fullname')||'Visitor'),
+    from_name:fval('fmsg-fullname')||'Visitor',
+    'Full Name':fval('fmsg-fullname'),
+    'Country':fval('fmsg-country'),
+    'Address':fval('fmsg-address'),
+    'Age':fval('fmsg-age'),
+    'Occupation':fval('fmsg-occupation'),
+    'Cell Number':fval('fmsg-cell'),
+    'Marital Status':fval('fmsg-marital'),
+    'Sex':fval('fmsg-sex'),
+    'Monthly Income':fval('fmsg-income'),
+    'Religion':fval('fmsg-religion'),
+    'Intended Use of Funds':fval('fmsg-usage'),
+    'Submitted':new Date().toLocaleString()
+  };
+  w3fSend(payload, function(){
+    document.getElementById('fmsgForm').style.display='none';
+    document.getElementById('fmsgOk').classList.add('show');
+  }, function(msg){alert('Error: '+msg);});
+}
+
+
+
+</script>
+</body>
+</html>
